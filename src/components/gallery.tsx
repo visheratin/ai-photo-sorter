@@ -36,7 +36,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
           onClick={closeImage}
         >
           <img
-            className="max-w-3xl max-h-96 p-4 cursor-pointer"
+            className="max-w-3xl max-h-[75%] max-w-[75%] p-4 cursor-pointer"
             src={selectedImage}
             alt="Selected"
           />
