@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.moving-gradient {
+    background-image: linear-gradient(
+      135deg,
+      #f9c5d1,
+      #f6d5e6,
+      #e0c3fc,
+      #9ec2ff,
+      #9ee9ff
+    );
+    background-size: 400% 400%;
+    animation: movingGradient 15s ease infinite;
+  }
+  
+  @keyframes movingGradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes glowing {
+    0% {
+      box-shadow: 0 0 2px #10b981, 0 0 4px #10b981, 0 0 8px #10b981, 0 0 16px #10b981;
+    }
+    50% {
+      box-shadow: 0 0 4px #10b981, 0 0 8px #10b981, 0 0 16px #10b981, 0 0 32px #10b981;
+    }
+    100% {
+      box-shadow: 0 0 2px #10b981, 0 0 4px #10b981, 0 0 8px #10b981, 0 0 16px #10b981;
+    }
+  }
+
+  .glowing-emerald {
+    animation: glowing 2s linear infinite;
+  }
+
+  .glowing-emerald:disabled {
+    animation: none;
+    background-color: #9CA3AF;
+  }

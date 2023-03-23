@@ -1,12 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  ClassificationPrediction,
-  MultimodalModel,
-  ZeroShotClassificationModel,
-  SessionParams,
-} from "@visheratin/web-ai";
+import * as wai from "@visheratin/web-ai";
 import { useDropzone } from "react-dropzone";
 import PhotoGallery from "@/components/gallery";
 import { FileInfo } from "@/components/fileInfo";
@@ -18,6 +13,8 @@ export default function Home() {
   const [classNames, setClassNames] = useState<string[]>([]);
 
   const [unsortedFiles, setUnsortedFiles] = useState<FileInfo[]>([]);
+
+  const [files, setFiles] = useState<FileInfo[]>([]);
 
   const [classes, setClasses] = useState<ClassData[]>([]);
 
@@ -34,13 +31,14 @@ export default function Home() {
           src: URL.createObjectURL(file),
         };
       });
-      const existingFiles = unsortedFiles.map((file) => file.name);
+      const existingFiles = files.map((file) => file.name);
       const filteredNewFiles = newFiles.filter(
         (file) => !existingFiles.includes(file.name)
       );
       setUnsortedFiles([...unsortedFiles, ...filteredNewFiles]);
+      setFiles([...files, ...filteredNewFiles]);
     },
-    [unsortedFiles]
+    [files, unsortedFiles]
   );
 
   const resizeFile = (file: File): Promise<File> =>
@@ -66,7 +64,7 @@ export default function Home() {
     onDrop,
   });
 
-  const [model, setModel] = useState<ZeroShotClassificationModel>();
+  const [model, setModel] = useState<wai.ZeroShotClassificationModel>();
 
   const processFiles = async (
     power: number,
@@ -79,11 +77,27 @@ export default function Home() {
     if (!model) {
       setStatus({ busy: false, progress: 0, message: "Model was not loaded!" });
       setTimeout(() => {
-        setStatus({ busy: false, progress: 0, message: "Ready" });
+        setStatus({
+          busy: false,
+          progress: 0,
+          message: "Waiting for the model",
+        });
       }, 2000);
       return;
     }
-    const newClasses = classNames.map((name): ClassData => {
+    const classes = [...classNames];
+    if (
+      classes.length === 0 ||
+      classes.filter((c) => c.length > 0).length === 0
+    ) {
+      setStatus({
+        busy: false,
+        progress: 0,
+        message: "No classes were set!",
+      });
+      return;
+    }
+    const newClasses = classes.map((name): ClassData => {
       return {
         name: name,
         files: [],
@@ -92,7 +106,7 @@ export default function Home() {
     setStatus({ progress: 0, busy: true, message: "Processing..." });
     const start = performance.now();
     const batch = power;
-    const dataFiles = [...unsortedFiles];
+    const dataFiles = [...files];
     for (let i = 0; i < dataFiles.length; i += batch) {
       setStatus({
         busy: true,
@@ -101,15 +115,15 @@ export default function Home() {
       });
       const toProcess = dataFiles.slice(i, i + batch).map((file) => file.src);
       const toProcessFiles = dataFiles.slice(i, i + batch);
-      const result = await model.process(toProcess, classNames);
+      const result = await model.process(toProcess, classes);
       if (toProcess.length === 1) {
-        const res = result.results as ClassificationPrediction[];
-        processResult(toProcessFiles[0], res, newClasses);
+        const res = result.results as wai.ClassificationPrediction[];
+        processResult(toProcessFiles[0], res, newClasses, classes);
       } else {
-        const resItems = result.results as ClassificationPrediction[][];
+        const resItems = result.results as wai.ClassificationPrediction[][];
         resItems.forEach((item, index) => {
-          const res = item as ClassificationPrediction[];
-          processResult(toProcessFiles[index], res, newClasses);
+          const res = item as wai.ClassificationPrediction[];
+          processResult(toProcessFiles[index], res, newClasses, classes);
         });
       }
     }
@@ -124,8 +138,9 @@ export default function Home() {
 
   const processResult = (
     file: FileInfo,
-    result: ClassificationPrediction[],
-    classes: ClassData[]
+    result: wai.ClassificationPrediction[],
+    classData: ClassData[],
+    classes: string[]
   ) => {
     if (result.length === 0) {
       return;
@@ -135,9 +150,9 @@ export default function Home() {
       return;
     }
     const foundClass = result[0].class;
-    const foundClassIndex = classNames.indexOf(foundClass);
-    classes[foundClassIndex].files.push(file);
-    setClasses([...classes]);
+    const foundClassIndex = classes.indexOf(foundClass);
+    classData[foundClassIndex].files.push(file);
+    setClasses([...classData]);
     const unsortedIdx = unsortedFiles.indexOf(file);
     unsortedFiles.splice(unsortedIdx, 1);
     setUnsortedFiles([...unsortedFiles]);
@@ -146,7 +161,7 @@ export default function Home() {
 
   return (
     <>
-      <header className="text-center py-6 bg-blue-600 text-white">
+      <header className="text-center py-6 bg-blue-600 moving-gradient">
         <h1 className="text-4xl font-semibold">Sort your photos with AI</h1>
         <h5 className="text-xl text-white-600">Powered by Web AI</h5>
       </header>
@@ -155,10 +170,10 @@ export default function Home() {
           onInputChange={setClassNames}
           modelCallback={setModel}
           process={processFiles}
-          classNum={classNames.length}
+          classNum={classNames.filter((c) => c.length > 0).length}
         />
-
-        <main className="flex-grow p-6 shadow lg:w-80 lg:h-screen">
+        <div className="border-l border-gray-300 h-auto my-2"></div>
+        <main className="flex-grow p-6 lg:w-80 lg:h-full">
           <section>
             <div className="flex justify-center">
               <div
@@ -203,17 +218,13 @@ export default function Home() {
                   <>
                     <section
                       key={item.name}
-                      className="rounded-md border border-blue-400 p-4"
+                      className="rounded-md border border-blue-400 p-4 my-4"
                     >
                       <h3 className="mb-4 text-xl font-semibold">
                         {item.name}
                       </h3>
                       <PhotoGallery images={item.files} />
                     </section>
-
-                    <div className="relative flex py-5 items-center">
-                      <div className="flex-grow border-t border-gray-400"></div>
-                    </div>
                   </>
                 )
             )}

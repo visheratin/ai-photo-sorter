@@ -4,6 +4,7 @@ import { InputData } from "./inputData";
 interface InputFieldsComponentProps {
   onInputChange: (inputs: string[]) => void;
   busy: boolean;
+  modelLoaded: boolean;
 }
 
 const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
@@ -69,7 +70,7 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
         </div>
       ))}
       <button
-        disabled={props.busy}
+        disabled={props.busy || !props.modelLoaded}
         onClick={addInputField}
         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 w-full"
       >
