@@ -12,6 +12,7 @@ import {
 } from "@visheratin/web-ai";
 import FileLoader from "@/components/fileLoader";
 import CodeSnippetModal from "@/components/codeSnippet";
+import IntroComponent from "@/components/intro";
 
 export default function Home() {
   const [classNames, setClassNames] = useState<string[]>([]);
@@ -308,9 +309,12 @@ export default function Home() {
   return (
     <>
       <header className="text-center py-6 bg-blue-600 moving-gradient">
-        <h1 className="text-4xl font-semibold">Sort your photos with AI</h1>
-        <h5 className="text-xl text-white-600">Powered by Web AI</h5>
+        <h1 className="text-4xl font-semibold">AI photo sorter</h1>
+        <h5 className="text-xl text-white-600 mt-2">
+          Organize your photos using the power of neural networks
+        </h5>
       </header>
+      <IntroComponent />
       <div className="flex flex-col lg:flex-row">
         <NavbarComponent
           onInputChange={setClassNames}
