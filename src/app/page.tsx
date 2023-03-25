@@ -13,6 +13,7 @@ import {
 import FileLoader from "@/components/fileLoader";
 import CodeSnippetModal from "@/components/codeSnippet";
 import IntroComponent from "@/components/intro";
+import FooterComponent from "@/components/footer";
 
 export default function Home() {
   const [classNames, setClassNames] = useState<string[]>([]);
@@ -28,8 +29,6 @@ export default function Home() {
   const [unixScript, setUnixScript] = useState("");
 
   const [winScript, setWinScript] = useState("");
-
-  const [modelFinished, setModelFinished] = useState(false);
 
   const setNewFiles = (newFiles: FileInfo[]) => {
     const existingFiles = files.map((file) => file.name);
@@ -315,7 +314,7 @@ export default function Home() {
         </h5>
       </header>
       <IntroComponent />
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row flex-grow min-h-screen">
         <NavbarComponent
           onInputChange={setClassNames}
           modelCallback={setModel}
@@ -364,6 +363,7 @@ export default function Home() {
           )}
         </main>
       </div>
+      <FooterComponent />
       <CodeSnippetModal
         unixCode={unixScript}
         windowsCode={winScript}

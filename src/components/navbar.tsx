@@ -131,7 +131,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
             !modelLoaded || props.classNum === 0 || status.progress !== 100
           }
           onClick={() => props.generateScript()}
-          className="bg-rose-500 text-white text-xl py-3 my-2 px-4 rounded-full focus:outline-none"
+          className="bg-rose-400 text-white text-xl py-3 px-4 rounded-full focus:outline-none"
         >
           Generate script
         </button>
@@ -147,6 +147,9 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
           <p className="font-semibold text-gray-700">
             Status: <span className="font-normal">{status.message}</span>
           </p>
+        </div>
+        <div className="relative flex items-center">
+          <div className="flex-grow border-t border-gray-400"></div>
         </div>
       </div>
     </nav>
