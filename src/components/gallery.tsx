@@ -1,8 +1,13 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
 import { FileInfo } from "./fileInfo";
+import { ClassData } from "./classData";
+import GalleryItem from "./galleryItem";
 
 interface PhotoGalleryProps {
   images: FileInfo[];
+  duplicates: ClassData[];
+  markDeleted: (src: string) => void;
 }
 
 const PhotoGallery = (props: PhotoGalleryProps) => {
@@ -18,17 +23,32 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
 
   return (
     <div>
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-10 gap-4">
         {props.images.map((image, index) => (
-          <div
+          <GalleryItem
+            image={image}
             key={index}
-            onClick={() => openImage(image.src)}
-            className="cursor-pointer"
-          >
-            <img className="object-cover h-48 w-full" src={image.src} alt="" />
-          </div>
+            openImage={openImage}
+            markDeleted={props.markDeleted}
+          />
         ))}
       </div>
+
+      {props.duplicates.map((info, index) => (
+        <div className="my-2" key={info.name}>
+          <h4 className="mb-2 text-lg font-semibold">Possible duplicates</h4>
+          <div className="grid grid-cols-2 md:grid-cols-10 gap-4">
+            {info.files.map((image, index) => (
+              <GalleryItem
+                image={image}
+                key={index}
+                openImage={openImage}
+                markDeleted={props.markDeleted}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
 
       {selectedImage && (
         <div

@@ -1,13 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import * as wai from "@visheratin/web-ai";
-import { useDropzone } from "react-dropzone";
+import { useState } from "react";
 import PhotoGallery from "@/components/gallery";
 import { FileInfo } from "@/components/fileInfo";
-import { NavbarComponent } from "./navbar";
+import { NavbarComponent } from "../components/navbar";
 import { ClassData } from "@/components/classData";
-import Resizer from "react-image-file-resizer";
+import {
+  ClassificationPrediction,
+  ZeroShotClassificationModel,
+  ZeroShotResult,
+} from "@visheratin/web-ai";
+import FileLoader from "@/components/fileLoader";
+import CodeSnippetModal from "@/components/codeSnippet";
 
 export default function Home() {
   const [classNames, setClassNames] = useState<string[]>([]);
@@ -16,55 +20,26 @@ export default function Home() {
 
   const [files, setFiles] = useState<FileInfo[]>([]);
 
-  const [classes, setClasses] = useState<ClassData[]>([]);
+  const [classFiles, setClassFiles] = useState<ClassData[]>([]);
 
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const resizedFiles: File[] = await Promise.all(
-        acceptedFiles.map((image: any) => {
-          return resizeFile(image);
-        })
-      );
-      const newFiles: FileInfo[] = resizedFiles.map((file) => {
-        return {
-          name: file.name,
-          src: URL.createObjectURL(file),
-        };
-      });
-      const existingFiles = files.map((file) => file.name);
-      const filteredNewFiles = newFiles.filter(
-        (file) => !existingFiles.includes(file.name)
-      );
-      setUnsortedFiles([...unsortedFiles, ...filteredNewFiles]);
-      setFiles([...files, ...filteredNewFiles]);
-    },
-    [files, unsortedFiles]
-  );
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const resizeFile = (file: File): Promise<File> =>
-    new Promise((resolve) => {
-      Resizer.imageFileResizer(
-        file,
-        600,
-        600,
-        "JPEG",
-        80,
-        0,
-        (uri) => {
-          resolve(uri as File);
-        },
-        "file"
-      );
-    });
+  const [unixScript, setUnixScript] = useState("");
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
-    onDrop,
-  });
+  const [winScript, setWinScript] = useState("");
 
-  const [model, setModel] = useState<wai.ZeroShotClassificationModel>();
+  const [modelFinished, setModelFinished] = useState(false);
+
+  const setNewFiles = (newFiles: FileInfo[]) => {
+    const existingFiles = files.map((file) => file.name);
+    const filteredNewFiles = newFiles.filter(
+      (file) => !existingFiles.includes(file.name)
+    );
+    setUnsortedFiles([...unsortedFiles, ...filteredNewFiles]);
+    setFiles([...files, ...filteredNewFiles]);
+  };
+
+  const [model, setModel] = useState<ZeroShotClassificationModel>();
 
   const processFiles = async (
     power: number,
@@ -101,6 +76,7 @@ export default function Home() {
       return {
         name: name,
         files: [],
+        duplicates: [],
       };
     });
     setStatus({ progress: 0, busy: true, message: "Processing..." });
@@ -115,15 +91,30 @@ export default function Home() {
       });
       const toProcess = dataFiles.slice(i, i + batch).map((file) => file.src);
       const toProcessFiles = dataFiles.slice(i, i + batch);
-      const result = await model.process(toProcess, classes);
+      const result = (await model.process(
+        toProcess,
+        classes
+      )) as ZeroShotResult;
       if (toProcess.length === 1) {
-        const res = result.results as wai.ClassificationPrediction[];
-        processResult(toProcessFiles[0], res, newClasses, classes);
+        const res = result.results as ClassificationPrediction[];
+        processResult(
+          toProcessFiles[0],
+          res,
+          result.imageFeatures[0],
+          newClasses,
+          classes
+        );
       } else {
-        const resItems = result.results as wai.ClassificationPrediction[][];
+        const resItems = result.results as ClassificationPrediction[][];
         resItems.forEach((item, index) => {
-          const res = item as wai.ClassificationPrediction[];
-          processResult(toProcessFiles[index], res, newClasses, classes);
+          const res = item as ClassificationPrediction[];
+          processResult(
+            toProcessFiles[index],
+            res,
+            result.imageFeatures[index],
+            newClasses,
+            classes
+          );
         });
       }
     }
@@ -134,29 +125,184 @@ export default function Home() {
       busy: false,
       message: `Finished in ${elapsed}s`,
     });
+    findDuplicates(newClasses);
   };
 
   const processResult = (
     file: FileInfo,
-    result: wai.ClassificationPrediction[],
+    result: ClassificationPrediction[],
+    embedding: number[],
     classData: ClassData[],
     classes: string[]
   ) => {
     if (result.length === 0) {
       return;
     }
-    console.log(file.name, result);
     if (result[0].confidence < 0.5) {
       return;
     }
+    file.embedding = embedding;
     const foundClass = result[0].class;
     const foundClassIndex = classes.indexOf(foundClass);
     classData[foundClassIndex].files.push(file);
-    setClasses([...classData]);
+    setClassFiles([...classData]);
     const unsortedIdx = unsortedFiles.indexOf(file);
     unsortedFiles.splice(unsortedIdx, 1);
     setUnsortedFiles([...unsortedFiles]);
     return;
+  };
+
+  const cosineSim = (vector1: number[], vector2: number[]) => {
+    let dotproduct = 0;
+    let m1 = 0;
+    let m2 = 0;
+    for (let i = 0; i < vector1.length; i++) {
+      dotproduct += vector1[i] * vector2[i];
+      m1 += vector1[i] * vector1[i];
+      m2 += vector2[i] * vector2[i];
+    }
+    m1 = Math.sqrt(m1);
+    m2 = Math.sqrt(m2);
+    const sim = dotproduct / (m1 * m2);
+    return sim;
+  };
+
+  const findDuplicates = async (clsFiles: ClassData[]) => {
+    const result: ClassData[] = [];
+    clsFiles.forEach((classData: ClassData) => {
+      const files = classData.files;
+      const duplicates: FileInfo[][] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        let dupeFound = false;
+        for (let j = 0; j < duplicates.length; j++) {
+          const dupes = duplicates[j];
+          for (let k = 0; k < dupes.length; k++) {
+            const dupe = dupes[k];
+            const sim = cosineSim(
+              file.embedding as number[],
+              dupe.embedding as number[]
+            );
+            if (sim > 0.9) {
+              dupes.push(file);
+              files.splice(i, 1);
+              dupeFound = true;
+              break;
+            }
+          }
+          if (dupeFound) {
+            break;
+          }
+        }
+        if (dupeFound) {
+          i--;
+          continue;
+        }
+        for (let j = i + 1; j < files.length; j++) {
+          const file2 = files[j];
+          const sim = cosineSim(
+            file.embedding as number[],
+            file2.embedding as number[]
+          );
+          if (sim > 0.9) {
+            const dupe: FileInfo[] = [file, file2];
+            duplicates.push(dupe);
+            files.splice(j, 1);
+            files.splice(i, 1);
+            i--;
+            break;
+          }
+        }
+      }
+      classData.duplicates = [];
+      for (let i = 0; i < duplicates.length; i++) {
+        const dupes = duplicates[i];
+        if (dupes.length > 1) {
+          classData.duplicates.push({ name: "", files: dupes, duplicates: [] });
+        }
+      }
+      result.push(classData);
+    });
+    setClassFiles([...result]);
+  };
+
+  const markDeleted = (fileName: string) => {
+    const clsFiles = [...classFiles];
+    for (let i = 0; i < clsFiles.length; i++) {
+      const cls = clsFiles[i];
+      for (let j = 0; j < cls.files.length; j++) {
+        const file = cls.files[j];
+        if (file.name === fileName) {
+          file.toDelete = !file.toDelete;
+          setClassFiles([...clsFiles]);
+          return;
+        }
+      }
+      for (let j = 0; j < cls.duplicates.length; j++) {
+        const dupes = cls.duplicates[j];
+        for (let k = 0; k < dupes.files.length; k++) {
+          const file = dupes.files[k];
+          if (file.name === fileName) {
+            file.toDelete = !file.toDelete;
+            setClassFiles([...clsFiles]);
+            return;
+          }
+        }
+      }
+    }
+    for (let i = 0; i < unsortedFiles.length; i++) {
+      const file = unsortedFiles[i];
+      if (file.name === fileName) {
+        file.toDelete = !file.toDelete;
+        setUnsortedFiles([...unsortedFiles]);
+        return;
+      }
+    }
+  };
+
+  const generateScript = () => {
+    const unixCommands: string[] = [];
+    const winCommands: string[] = [];
+    const unsorted = unsortedFiles.filter((f) => f.toDelete);
+    for (let i = 0; i < unsorted.length; i++) {
+      const file = unsorted[i];
+      unixCommands.push(`rm "${file.name}"`);
+      winCommands.push(`del /q "${file.name}"`);
+    }
+    const clsFiles = [...classFiles];
+    for (let i = 0; i < clsFiles.length; i++) {
+      unixCommands.push(`mkdir "${clsFiles[i].name}"`);
+      winCommands.push(`mkdir "${clsFiles[i].name}"`);
+      const cls = clsFiles[i];
+      for (let j = 0; j < cls.files.length; j++) {
+        const file = cls.files[j];
+        if (file.toDelete) {
+          unixCommands.push(`rm "${file.name}"`);
+          winCommands.push(`del /q "${file.name}"`);
+        } else {
+          unixCommands.push(`mv "${file.name}" "${cls.name}"/`);
+          winCommands.push(`move "${file.name}" "${cls.name}"/`);
+        }
+      }
+      for (let j = 0; j < cls.duplicates.length; j++) {
+        const dupes = cls.duplicates[j];
+        for (let k = 0; k < dupes.files.length; k++) {
+          const file = dupes.files[k];
+          if (file.toDelete) {
+            unixCommands.push(`rm "${file.name}"`);
+            winCommands.push(`del /q "${file.name}"`);
+          } else {
+            unixCommands.push(`mv "${file.name}" "${cls.name}"/`);
+            winCommands.push(`move "${file.name}" "${cls.name}"/`);
+          }
+        }
+      }
+    }
+    const unixScript = unixCommands.join("\n");
+    const winScript = winCommands.join("\n");
+    setUnixScript(unixScript);
+    setWinScript(winScript);
+    setModalOpen(true);
   };
 
   return (
@@ -171,50 +317,20 @@ export default function Home() {
           modelCallback={setModel}
           process={processFiles}
           classNum={classNames.filter((c) => c.length > 0).length}
+          generateScript={generateScript}
         />
         <div className="border-l border-gray-300 h-auto my-2"></div>
         <main className="flex-grow p-6 lg:w-80 lg:h-full">
           <section>
-            <div className="flex justify-center">
-              <div
-                {...getRootProps()}
-                className="border-2 border-dashed border-blue-400 rounded-lg p-4 w-full h-32 text-center hover:bg-gray-200 cursor-pointer transition-all duration-200"
-              >
-                <input
-                  {...getInputProps()}
-                  className="hidden"
-                  type="file"
-                  name="file"
-                  id="file"
-                  multiple
-                />
-                <label className="text-gray-600 font-semibold">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-12 w-12 mx-auto mb-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  Click or drag and drop files here
-                </label>
-              </div>
-            </div>
+            <FileLoader setNewFiles={setNewFiles} />
           </section>
           <div className="relative flex py-5 items-center">
             <div className="flex-grow border-t border-gray-400"></div>
           </div>
-          {classes.length > 0 &&
-            classes.map(
+          {classFiles.length > 0 &&
+            classFiles.map(
               (item) =>
-                item.files.length > 0 && (
+                (item.files.length > 0 || item.duplicates.length > 0) && (
                   <>
                     <section
                       key={item.name}
@@ -223,7 +339,11 @@ export default function Home() {
                       <h3 className="mb-4 text-xl font-semibold">
                         {item.name}
                       </h3>
-                      <PhotoGallery images={item.files} />
+                      <PhotoGallery
+                        images={item.files}
+                        duplicates={item.duplicates}
+                        markDeleted={markDeleted}
+                      />
                     </section>
                   </>
                 )
@@ -231,28 +351,21 @@ export default function Home() {
           {unsortedFiles.length > 0 && (
             <section className="rounded-md border border-blue-400 p-4">
               <h3 className="mb-4 text-xl font-semibold">Unsorted</h3>
-              <PhotoGallery images={unsortedFiles} />
-              {/* <div className="mt-6">
-              <h4 className="mb-2 text-lg font-semibold">
-                Possible duplicates
-              </h4>
-              <div className="grid grid-cols-2 gap-2">
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt="Image description"
-                  className="rounded-md"
-                />
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt="Image description"
-                  className="rounded-md"
-                />
-              </div>
-            </div> */}
+              <PhotoGallery
+                images={unsortedFiles}
+                duplicates={[]}
+                markDeleted={markDeleted}
+              />
             </section>
           )}
         </main>
       </div>
+      <CodeSnippetModal
+        unixCode={unixScript}
+        windowsCode={winScript}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </>
   );
 }

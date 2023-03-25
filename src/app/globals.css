@@ -26,24 +26,3 @@
       background-position: 0% 50%;
     }
   }
-
-  @keyframes glowing {
-    0% {
-      box-shadow: 0 0 2px #10b981, 0 0 4px #10b981, 0 0 8px #10b981, 0 0 16px #10b981;
-    }
-    50% {
-      box-shadow: 0 0 4px #10b981, 0 0 8px #10b981, 0 0 16px #10b981, 0 0 32px #10b981;
-    }
-    100% {
-      box-shadow: 0 0 2px #10b981, 0 0 4px #10b981, 0 0 8px #10b981, 0 0 16px #10b981;
-    }
-  }
-
-  .glowing-emerald {
-    animation: glowing 2s linear infinite;
-  }
-
-  .glowing-emerald:disabled {
-    animation: none;
-    background-color: #9CA3AF;
-  }

@@ -1,11 +1,15 @@
 import InputFieldsComponent from "@/components/classes";
 import Tooltip from "@/components/tooltip";
-import * as wai from "@visheratin/web-ai";
+import {
+  MultimodalModel,
+  SessionParams,
+  ZeroShotClassificationModel,
+} from "@visheratin/web-ai";
 import React, { useEffect, useRef, useState } from "react";
 
 interface NavbarComponentProps {
   onInputChange: (inputs: string[]) => void;
-  modelCallback: (model: wai.ZeroShotClassificationModel) => void;
+  modelCallback: (model: ZeroShotClassificationModel) => void;
   process: (
     power: number,
     statusCallback: (status: {
@@ -14,6 +18,7 @@ interface NavbarComponentProps {
       message: string;
     }) => void
   ) => void;
+  generateScript: () => void;
   classNum: number;
 }
 
@@ -26,7 +31,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
   const [status, setStatus] = useState({
     progress: 0,
     busy: false,
-    message: "Waiting for the model",
+    message: "Waiting for AI",
   });
 
   const [modelLoaded, setModelLoaded] = useState(false);
@@ -36,15 +41,14 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
   };
 
   const loadModel = async () => {
-    console.log(wai);
     const power = parseFloat(powerRef.current!.value);
-    wai.SessionParams.numThreads = power;
-    setStatus({ ...status, busy: true, message: "Loading model..." });
-    const modelResult = await wai.MultimodalModel.create("clip-base-quant");
+    SessionParams.numThreads = power;
+    setStatus({ ...status, busy: true, message: "Initializing AI..." });
+    const modelResult = await MultimodalModel.create("clip-base-quant");
     console.log(`Model loading time: ${modelResult.elapsed}s`);
-    props.modelCallback(modelResult.model as wai.ZeroShotClassificationModel);
+    props.modelCallback(modelResult.model as ZeroShotClassificationModel);
     setModelLoaded(true);
-    setStatus({ ...status, busy: false, message: "Model was loaded!" });
+    setStatus({ ...status, busy: false, message: "AI was initialized!" });
     setTimeout(() => {
       setStatus({ ...status, message: "Ready" });
     }, 2000);
@@ -67,7 +71,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
           style={modelLoaded ? { display: "none" } : {}}
         >
           <div>
-            <h4 className="text-xl">Load the model</h4>
+            <h4 className="text-xl">AI setup</h4>
           </div>
           <div className="w-full">
             <label className="mr-2 text-gray-700">
@@ -95,9 +99,9 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
           <button
             disabled={status.busy}
             onClick={() => loadModel()}
-            className="bg-blue-600 text-white w-full py-2 px-4 rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="bg-blue-600 text-white w-full py-2 px-4 rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
-            Load model
+            Initialize
           </button>
         </div>
         <div
@@ -117,9 +121,19 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
           disabled={status.busy || !modelLoaded}
           hidden={!modelLoaded || props.classNum === 0}
           onClick={() => process()}
-          className="bg-emerald-500 text-white text-xl py-2 my-5 px-4 rounded-full focus:outline-none glowing-emerald"
+          className="bg-emerald-500 text-white text-xl py-3 my-2 px-4 rounded-full focus:outline-none"
         >
           Start
+        </button>
+        <button
+          disabled={status.busy || !modelLoaded}
+          hidden={
+            !modelLoaded || props.classNum === 0 || status.progress !== 100
+          }
+          onClick={() => props.generateScript()}
+          className="bg-rose-500 text-white text-xl py-3 my-2 px-4 rounded-full focus:outline-none"
+        >
+          Generate script
         </button>
         <div className="h-2 mt-4 bg-gray-200 rounded">
           <div

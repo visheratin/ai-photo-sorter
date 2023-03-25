@@ -12,14 +12,14 @@
     "@types/node": "18.15.5",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
-    "@visheratin/web-ai": "^0.7.2",
+    "@visheratin/web-ai": "file:../in-browser-ai",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "next": "13.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
-    "react-images-viewer": "^1.7.1",
+    "react-image-file-resizer": "^0.4.8",
     "typescript": "5.0.2"
   },
   "devDependencies": {
