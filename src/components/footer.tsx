@@ -17,7 +17,7 @@ const FooterComponent = () => {
           </div>
           <div>
             <a
-              href="https://github.com"
+              href="https://github.com/visheratin/ai-photo-sorter"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center bg-gray-700 text-white h-10 w-10 rounded-md hover:bg-gray-500 mx-2 p-2"
