@@ -31,12 +31,16 @@ export default function Home() {
   const [winScript, setWinScript] = useState("");
 
   const setNewFiles = (newFiles: FileInfo[]) => {
-    const existingFiles = files.map((file) => file.name);
+    const existingFiles = files.map((file) => file.hash);
     const filteredNewFiles = newFiles.filter(
-      (file) => !existingFiles.includes(file.name)
+      (file) => !existingFiles.includes(file.hash)
     );
-    setUnsortedFiles([...unsortedFiles, ...filteredNewFiles]);
-    setFiles([...files, ...filteredNewFiles]);
+    setUnsortedFiles((prevFiles: FileInfo[]) => {
+      return [...prevFiles, ...filteredNewFiles];
+    });
+    setFiles((prevFiles: FileInfo[]) => {
+      return [...prevFiles, ...filteredNewFiles];
+    });
   };
 
   const [model, setModel] = useState<ZeroShotClassificationModel>();
@@ -83,34 +87,35 @@ export default function Home() {
     const start = performance.now();
     const batch = power;
     const dataFiles = [...files];
+    setUnsortedFiles([...files]);
     for (let i = 0; i < dataFiles.length; i += batch) {
       setStatus({
         busy: true,
         message: "Processing...",
         progress: (i / dataFiles.length) * 100,
       });
-      const toProcess = dataFiles.slice(i, i + batch).map((file) => file.src);
       const toProcessFiles = dataFiles.slice(i, i + batch);
+      const toProcess = toProcessFiles.map((file) => file.src);
       const result = (await model.process(
         toProcess,
         classes
       )) as ZeroShotResult;
       if (toProcess.length === 1) {
-        const res = result.results as ClassificationPrediction[];
+        const prediction = result.results as ClassificationPrediction[];
         processResult(
           toProcessFiles[0],
-          res,
+          prediction,
           result.imageFeatures[0],
           newClasses,
           classes
         );
       } else {
-        const resItems = result.results as ClassificationPrediction[][];
-        resItems.forEach((item, index) => {
-          const res = item as ClassificationPrediction[];
+        const predictions = result.results as ClassificationPrediction[][];
+        predictions.forEach((pred, index) => {
+          const prediction = pred as ClassificationPrediction[];
           processResult(
             toProcessFiles[index],
-            res,
+            prediction,
             result.imageFeatures[index],
             newClasses,
             classes
@@ -146,9 +151,11 @@ export default function Home() {
     const foundClassIndex = classes.indexOf(foundClass);
     classData[foundClassIndex].files.push(file);
     setClassFiles([...classData]);
-    const unsortedIdx = unsortedFiles.indexOf(file);
-    unsortedFiles.splice(unsortedIdx, 1);
-    setUnsortedFiles([...unsortedFiles]);
+    setUnsortedFiles((prevFiles: FileInfo[]) => {
+      const unsortedIdx = prevFiles.indexOf(file);
+      prevFiles.splice(unsortedIdx, 1);
+      return [...prevFiles];
+    });
     return;
   };
 
@@ -218,7 +225,11 @@ export default function Home() {
       for (let i = 0; i < duplicates.length; i++) {
         const dupes = duplicates[i];
         if (dupes.length > 1) {
-          classData.duplicates.push({ name: "", files: dupes, duplicates: [] });
+          classData.duplicates.push({
+            name: `Possible duplicate ${i}`,
+            files: dupes,
+            duplicates: [],
+          });
         }
       }
       result.push(classData);
@@ -226,15 +237,15 @@ export default function Home() {
     setClassFiles([...result]);
   };
 
-  const markDeleted = (fileName: string) => {
+  const markDeleted = (hash: string) => {
     const clsFiles = [...classFiles];
     for (let i = 0; i < clsFiles.length; i++) {
       const cls = clsFiles[i];
       for (let j = 0; j < cls.files.length; j++) {
         const file = cls.files[j];
-        if (file.name === fileName) {
+        if (file.hash === hash) {
           file.toDelete = !file.toDelete;
-          setClassFiles([...clsFiles]);
+          setClassFiles(clsFiles);
           return;
         }
       }
@@ -242,19 +253,20 @@ export default function Home() {
         const dupes = cls.duplicates[j];
         for (let k = 0; k < dupes.files.length; k++) {
           const file = dupes.files[k];
-          if (file.name === fileName) {
+          if (file.hash === hash) {
             file.toDelete = !file.toDelete;
-            setClassFiles([...clsFiles]);
+            setClassFiles(clsFiles);
             return;
           }
         }
       }
     }
-    for (let i = 0; i < unsortedFiles.length; i++) {
-      const file = unsortedFiles[i];
-      if (file.name === fileName) {
+    const unsorted = [...unsortedFiles];
+    for (let i = 0; i < unsorted.length; i++) {
+      const file = unsorted[i];
+      if (file.hash === hash) {
         file.toDelete = !file.toDelete;
-        setUnsortedFiles([...unsortedFiles]);
+        setUnsortedFiles(unsorted);
         return;
       }
     }
@@ -334,21 +346,17 @@ export default function Home() {
             classFiles.map(
               (item) =>
                 (item.files.length > 0 || item.duplicates.length > 0) && (
-                  <>
-                    <section
-                      key={item.name}
-                      className="rounded-md border border-blue-400 p-4 my-4"
-                    >
-                      <h3 className="mb-4 text-xl font-semibold">
-                        {item.name}
-                      </h3>
-                      <PhotoGallery
-                        images={item.files}
-                        duplicates={item.duplicates}
-                        markDeleted={markDeleted}
-                      />
-                    </section>
-                  </>
+                  <section
+                    key={item.name}
+                    className="rounded-md border border-blue-400 p-4 my-4"
+                  >
+                    <h3 className="mb-4 text-xl font-semibold">{item.name}</h3>
+                    <PhotoGallery
+                      images={item.files}
+                      duplicates={item.duplicates}
+                      markDeleted={markDeleted}
+                    />
+                  </section>
                 )
             )}
           {unsortedFiles.length > 0 && (

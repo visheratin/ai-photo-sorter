@@ -27,7 +27,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
         {props.images.map((image, index) => (
           <GalleryItem
             image={image}
-            key={index}
+            key={image.src}
             openImage={openImage}
             markDeleted={props.markDeleted}
           />
@@ -41,7 +41,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
             {info.files.map((image, index) => (
               <GalleryItem
                 image={image}
-                key={index}
+                key={image.src}
                 openImage={openImage}
                 markDeleted={props.markDeleted}
               />

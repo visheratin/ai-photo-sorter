@@ -10,7 +10,7 @@ interface GalleryItemProps {
 
 const GalleryItem = (props: GalleryItemProps) => {
   return (
-    <div className="cursor-pointer relative">
+    <div key={props.image.src} className="cursor-pointer relative">
       <img
         className={
           props.image.toDelete
@@ -24,7 +24,7 @@ const GalleryItem = (props: GalleryItemProps) => {
 
       <button
         onClick={() => {
-          if (props.markDeleted) props.markDeleted(props.image.name);
+          if (props.markDeleted) props.markDeleted(props.image.hash);
         }}
         className={
           props.image.toDelete

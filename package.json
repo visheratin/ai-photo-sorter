@@ -16,6 +16,7 @@
     "@visheratin/web-ai": "^0.7.4",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "md5": "^2.3.0",
     "next": "13.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -24,6 +25,7 @@
     "typescript": "5.0.2"
   },
   "devDependencies": {
+    "@types/md5": "^2.3.2",
     "autoprefixer": "^10.4.14",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "postcss": "^8.4.21",
