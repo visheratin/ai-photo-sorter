@@ -23,7 +23,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
 
   return (
     <div>
-      <div className="grid grid-cols-2 md:grid-cols-10 gap-4">
+      <div className="grid grid-cols-2 2xl:grid-cols-10 md:grid-cols-5 gap-4">
         {props.images.map((image, index) => (
           <GalleryItem
             image={image}
@@ -37,7 +37,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
       {props.duplicates.map((info, index) => (
         <div className="my-2" key={info.name}>
           <h4 className="mb-2 text-lg font-semibold">Possible duplicates</h4>
-          <div className="grid grid-cols-2 md:grid-cols-10 gap-4">
+          <div className="grid grid-cols-2 2xl:grid-cols-10 md:grid-cols-5 gap-4">
             {info.files.map((image, index) => (
               <GalleryItem
                 image={image}
