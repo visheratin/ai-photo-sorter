@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { InputData } from "./inputData";
 
 interface InputFieldsComponentProps {
@@ -12,10 +12,21 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
 ) => {
   const [inputs, setInputs] = useState<InputData[]>([]);
 
-  const addInputField = () => {
-    const updatedInputs = [...inputs, { id: Date.now(), value: "" }];
-    setInputs(updatedInputs);
-    props.onInputChange(updatedInputs.map((input) => input.value));
+  const addInputField = (index?: number) => {
+    const newInput = { id: Date.now(), value: "" };
+    setInputs((prevInputs) => {
+      const updatedInputs = [...prevInputs];
+      if (index === undefined) {
+        updatedInputs.push(newInput);
+      } else {
+        updatedInputs.splice(index + 1, 0, newInput);
+      }
+      setTimeout(() => {
+        focusInput(newInput.id);
+      }, 0);
+      return updatedInputs;
+    });
+    props.onInputChange(inputs.map((input) => input.value));
   };
 
   const removeInputField = (id: number) => {
@@ -32,19 +43,35 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
     props.onInputChange(updatedInputs.map((input) => input.value));
   };
 
+  const focusInput = (id: number) => {
+    const inputElement = document.getElementById(
+      `input-${id}`
+    ) as HTMLInputElement;
+    inputElement?.focus();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addInputField(index);
+    }
+  };
+
   useEffect(() => {
     props.onInputChange(inputs.map((input) => input.value));
   }, []);
 
   return (
     <div className="w-full flex flex-col items-center space-y-2">
-      {inputs.map((input) => (
+      {inputs.map((input, index) => (
         <div key={input.id} className="flex items-center space-x-2 sm:w-full">
           <input
+            id={`input-${input.id}`}
             type="text"
             value={input.value}
             disabled={props.busy}
             onChange={(e) => handleInputChange(input.id, e.target.value)}
+            onKeyUp={(e) => handleKeyPress(e, index)}
             className="flex-grow px-4 py-2 rounded-l-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-gray-300 rounded-md"
           />
           <button
@@ -71,7 +98,7 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
       ))}
       <button
         disabled={props.busy || !props.modelLoaded}
-        onClick={addInputField}
+        onClick={() => addInputField()}
         className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 w-full"
       >
         Add
