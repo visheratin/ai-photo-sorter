@@ -99,7 +99,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
           <button
             disabled={status.busy}
             onClick={() => loadModel()}
-            className="bg-blue-600 text-white w-full py-2 px-4 rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="bg-blue-600 text-white w-full py-2 px-4 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
             Initialize
           </button>
@@ -121,7 +121,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
           disabled={status.busy || !modelLoaded}
           hidden={!modelLoaded || props.classNum === 0}
           onClick={() => process()}
-          className="bg-emerald-500 text-white text-xl py-3 my-2 px-4 rounded-full focus:outline-none"
+          className="bg-emerald-500 text-white text-xl py-2 my-2 px-4 rounded focus:outline-none"
         >
           Start
         </button>
@@ -131,7 +131,7 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
             !modelLoaded || props.classNum === 0 || status.progress !== 100
           }
           onClick={() => props.generateScript()}
-          className="bg-rose-400 text-white text-xl py-3 px-4 rounded-full focus:outline-none"
+          className="bg-rose-400 text-white text-xl py-2 px-4 rounded focus:outline-none"
         >
           Generate script
         </button>

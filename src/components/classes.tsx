@@ -72,11 +72,11 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
             disabled={props.busy}
             onChange={(e) => handleInputChange(input.id, e.target.value)}
             onKeyUp={(e) => handleKeyPress(e, index)}
-            className="flex-grow px-4 py-2 rounded-l-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-gray-300 rounded-md"
+            className="flex-grow px-4 py-2 rounded text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-gray-300"
           />
           <button
             disabled={props.busy}
-            className="px-4 py-2 bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 rounded-r-md"
+            className="px-4 py-2 bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 rounded"
             onClick={() => {
               removeInputField(input.id);
             }}
@@ -99,7 +99,7 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
       <button
         disabled={props.busy || !props.modelLoaded}
         onClick={() => addInputField()}
-        className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 w-full"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 w-full"
       >
         Add
       </button>
