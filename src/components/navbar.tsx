@@ -20,6 +20,7 @@ interface NavbarComponentProps {
   ) => void;
   generateScript: () => void;
   classNum: number;
+  stopProcessing: () => void;
 }
 
 export const NavbarComponent: React.FC<NavbarComponentProps> = (
@@ -119,11 +120,21 @@ export const NavbarComponent: React.FC<NavbarComponentProps> = (
         </div>
         <button
           disabled={status.busy || !modelLoaded}
-          hidden={!modelLoaded || props.classNum === 0}
+          hidden={!modelLoaded || props.classNum === 0 || status.busy}
           onClick={() => process()}
           className="bg-emerald-500 text-white text-xl py-2 my-2 px-4 rounded focus:outline-none"
         >
           Start
+        </button>
+        <button
+          hidden={!modelLoaded || props.classNum === 0 || !status.busy}
+          onClick={() => {
+            console.log("stopping");
+            props.stopProcessing();
+          }}
+          className="bg-red-500 text-white text-xl py-2 my-2 px-4 rounded focus:outline-none"
+        >
+          Stop
         </button>
         <button
           disabled={status.busy || !modelLoaded}

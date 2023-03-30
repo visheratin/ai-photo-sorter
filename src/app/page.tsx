@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PhotoGallery from "@/components/gallery";
 import { FileInfo } from "@/components/fileInfo";
 import { NavbarComponent } from "../components/navbar";
@@ -29,6 +29,8 @@ export default function Home() {
   const [unixScript, setUnixScript] = useState("");
 
   const [winScript, setWinScript] = useState("");
+
+  const toStop = useRef(false);
 
   const setNewFiles = (newFiles: FileInfo[]) => {
     const existingFiles = files.map((file) => file.hash);
@@ -121,6 +123,15 @@ export default function Home() {
             classes
           );
         });
+      }
+      if (toStop.current) {
+        setStatus({
+          progress: 0,
+          busy: false,
+          message: "Stopped",
+        });
+        toStop.current = false;
+        return;
       }
     }
     const end = performance.now();
@@ -317,6 +328,11 @@ export default function Home() {
     setModalOpen(true);
   };
 
+  const stopProcessing = () => {
+    console.log("Stopping processing");
+    toStop.current = true;
+  };
+
   return (
     <>
       <header className="text-center py-6 bg-blue-600 moving-gradient">
@@ -333,6 +349,7 @@ export default function Home() {
           process={processFiles}
           classNum={classNames.filter((c) => c.length > 0).length}
           generateScript={generateScript}
+          stopProcessing={stopProcessing}
         />
         <div className="border-l border-gray-300 h-auto my-2"></div>
         <main className="flex-grow p-6 lg:w-80 lg:h-full">
