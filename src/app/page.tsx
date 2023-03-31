@@ -151,6 +151,7 @@ export default function Home() {
     classData: ClassData[],
     classes: string[]
   ) => {
+    file.classPredictions = result;
     if (result.length === 0) {
       return;
     }

@@ -5,7 +5,7 @@ import { FileInfo } from "./fileInfo";
 interface GalleryItemProps {
   image: FileInfo;
   markDeleted: (src: string) => void;
-  openImage: (src: string) => void;
+  openImage: (file: FileInfo) => void;
 }
 
 const GalleryItem = (props: GalleryItemProps) => {
@@ -19,7 +19,7 @@ const GalleryItem = (props: GalleryItemProps) => {
         }
         src={props.image.src}
         alt=""
-        onClick={() => props.openImage(props.image.src)}
+        onClick={() => props.openImage(props.image)}
       />
 
       <button

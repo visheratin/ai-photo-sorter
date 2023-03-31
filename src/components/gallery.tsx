@@ -11,14 +11,16 @@ interface PhotoGalleryProps {
 }
 
 const PhotoGallery = (props: PhotoGalleryProps) => {
-  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImage, setSelectedImage] = useState<FileInfo | undefined>(
+    undefined
+  );
 
-  const openImage = (src: string) => {
-    setSelectedImage(src);
+  const openImage = (file: FileInfo) => {
+    setSelectedImage(file);
   };
 
   const closeImage = () => {
-    setSelectedImage("");
+    setSelectedImage(undefined);
   };
 
   return (
@@ -55,11 +57,38 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
           className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={closeImage}
         >
-          <img
-            className="max-w-3xl max-h-[75%] max-w-[75%] p-4 cursor-pointer"
-            src={selectedImage}
-            alt="Selected"
-          />
+          <div className="bg-white p-2 rounded flex flex-col items-center">
+            <img
+              className="max-w-3xl max-h-[75%] max-w-[75%] cursor-pointer mb-1"
+              src={selectedImage.src}
+              alt="Selected"
+            />
+            <h3 className="font-semibold mb-2">{selectedImage.name}</h3>
+            {selectedImage.classPredictions.length > 0 && (
+              <table className="table-auto w-1/2">
+                <thead>
+                  <tr>
+                    <th className="font-semibold text-sm text-left">Class</th>
+                    <th className="font-semibold text-sm text-right">
+                      Confidence
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedImage.classPredictions.map((prediction, index) => (
+                    <tr key={index}>
+                      <td className="text-sm py-1 text-left">
+                        {prediction.class}
+                      </td>
+                      <td className="text-sm py-1 text-right">
+                        {prediction.confidence.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -38,6 +38,7 @@ const FileLoader = (props: FileLoaderProps) => {
           hash: md5(resizedFile.name + resizedFile.size),
           embedding: null,
           toDelete: false,
+          classPredictions: [],
         };
         props.setNewFiles([info]);
       }

@@ -4,7 +4,7 @@ const nextConfig = {
   experimental: {
     appDir: true,
   },
-  // transpilePackages: ['@visheratin/web-ai'],
+  transpilePackages: ['@visheratin/web-ai'],
   webpack: (config, { }) => {
     config.resolve.fallback = { 
       fs: false,
