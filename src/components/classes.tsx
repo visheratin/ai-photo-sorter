@@ -64,7 +64,7 @@ const InputFieldsComponent: React.FC<InputFieldsComponentProps> = (
   return (
     <div className="w-full flex flex-col items-center space-y-2">
       {inputs.map((input, index) => (
-        <div key={input.id} className="flex items-center space-x-2 sm:w-full">
+        <div key={input.id} className="flex items-center space-x-2 w-full">
           <input
             id={`input-${input.id}`}
             type="text"
