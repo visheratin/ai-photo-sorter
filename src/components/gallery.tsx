@@ -76,14 +76,18 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
                 </thead>
                 <tbody>
                   {selectedImage.classPredictions.map((prediction, index) => (
-                    <tr key={index}>
-                      <td className="text-sm py-1 text-left">
-                        {prediction.class}
-                      </td>
-                      <td className="text-sm py-1 text-right">
-                        {prediction.confidence.toFixed(2)}
-                      </td>
-                    </tr>
+                    <>
+                      {prediction.confidence > 0.05 && (
+                        <tr key={index}>
+                          <td className="text-sm py-1 text-left">
+                            {prediction.class}
+                          </td>
+                          <td className="text-sm py-1 text-right">
+                            {prediction.confidence.toFixed(2)}
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   ))}
                 </tbody>
               </table>
