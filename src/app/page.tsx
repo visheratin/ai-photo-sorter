@@ -14,6 +14,7 @@ import FileLoader from "@/components/fileLoader";
 import CodeSnippetModal from "@/components/codeSnippet";
 import IntroComponent from "@/components/intro";
 import FooterComponent from "@/components/footer";
+import ClassSelector from "@/components/classSelector";
 
 export default function Home() {
   const [classNames, setClassNames] = useState<string[]>([]);
@@ -31,6 +32,10 @@ export default function Home() {
   const [winScript, setWinScript] = useState("");
 
   const toStop = useRef(false);
+
+  const [movingFile, setMovingFile] = useState<FileInfo | undefined>();
+
+  const [showMoveModal, setShowMoveModal] = useState(false);
 
   const setNewFiles = (newFiles: FileInfo[]) => {
     const existingFiles = files.map((file) => file.hash);
@@ -334,6 +339,53 @@ export default function Home() {
     toStop.current = true;
   };
 
+  const startFileMoving = (file: FileInfo | undefined) => {
+    setMovingFile(file);
+    setShowMoveModal(true);
+  };
+
+  const moveToClass = (file: FileInfo, clsName: string) => {
+    console.log(`Moving ${file.name} to ${clsName}`);
+    const clsFiles = [...classFiles];
+    let currentClass = "";
+    for (let i = 0; i < clsFiles.length; i++) {
+      const cls = clsFiles[i];
+      if (cls.files.includes(file)) {
+        currentClass = cls.name;
+        break;
+      }
+      for (let j = 0; j < cls.duplicates.length; j++) {
+        const dupes = cls.duplicates[j];
+        if (dupes.files.includes(file)) {
+          currentClass = cls.name;
+          break;
+        }
+      }
+    }
+    if (currentClass === clsName) {
+      return;
+    }
+    for (let i = 0; i < clsFiles.length; i++) {
+      const cls = clsFiles[i];
+      if (cls.name === clsName) {
+        cls.files.push(file);
+        continue;
+      }
+      if (cls.files.includes(file)) {
+        cls.files.splice(cls.files.indexOf(file), 1);
+        continue;
+      }
+      for (let j = 0; j < cls.duplicates.length; j++) {
+        const dupes = cls.duplicates[j];
+        if (dupes.files.includes(file)) {
+          dupes.files.splice(dupes.files.indexOf(file), 1);
+          continue;
+        }
+      }
+    }
+    setClassFiles(clsFiles);
+  };
+
   return (
     <>
       <header className="text-center py-6 bg-blue-600 moving-gradient">
@@ -373,6 +425,7 @@ export default function Home() {
                       images={item.files}
                       duplicates={item.duplicates}
                       markDeleted={markDeleted}
+                      moveToClass={startFileMoving}
                     />
                   </section>
                 )
@@ -384,6 +437,7 @@ export default function Home() {
                 images={unsortedFiles}
                 duplicates={[]}
                 markDeleted={markDeleted}
+                moveToClass={startFileMoving}
               />
             </section>
           )}
@@ -395,6 +449,13 @@ export default function Home() {
         windowsCode={winScript}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
+      />
+      <ClassSelector
+        classes={classNames}
+        onClassSet={moveToClass}
+        file={movingFile}
+        isOpen={showMoveModal}
+        onClose={() => setShowMoveModal(false)}
       />
     </>
   );

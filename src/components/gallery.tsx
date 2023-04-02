@@ -8,6 +8,7 @@ interface PhotoGalleryProps {
   images: FileInfo[];
   duplicates: ClassData[];
   markDeleted: (src: string) => void;
+  moveToClass: (file: FileInfo | undefined) => void;
 }
 
 const PhotoGallery = (props: PhotoGalleryProps) => {
@@ -32,6 +33,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
             key={image.src}
             openImage={openImage}
             markDeleted={props.markDeleted}
+            moveToClass={props.moveToClass}
           />
         ))}
       </div>
@@ -46,6 +48,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
                 key={image.src}
                 openImage={openImage}
                 markDeleted={props.markDeleted}
+                moveToClass={props.moveToClass}
               />
             ))}
           </div>
