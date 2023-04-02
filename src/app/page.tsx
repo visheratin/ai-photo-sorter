@@ -384,6 +384,14 @@ export default function Home() {
       }
     }
     setClassFiles(clsFiles);
+    for (let i = 0; i < unsortedFiles.length; i++) {
+      const unsorted = unsortedFiles[i];
+      if (unsorted === file) {
+        unsortedFiles.splice(i, 1);
+        break;
+      }
+    }
+    setUnsortedFiles(unsortedFiles);
   };
 
   return (
