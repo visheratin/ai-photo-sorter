@@ -13,10 +13,9 @@ export const metadata = {
   ],
   metadataBase: new URL("https://ai-photo-sorter.vercel.app/"),
   openGraph: {
-    title: "Guess the images by asking AI",
-    description: "Can you align your imagination with AI's vision?",
+    title: "AI photo sorter",
+    description: "Organize your photos using the power of neural networks",
     url: "https://ai-photo-sorter.vercel.app/",
-    siteName: "Ask. Imagine. Guess.",
     images: [
       {
         url: "https://ai-photo-sorter.vercel.app/og.jpg",
