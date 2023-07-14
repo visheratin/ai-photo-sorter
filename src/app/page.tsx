@@ -6,10 +6,10 @@ import { FileInfo } from "@/components/fileInfo";
 import { NavbarComponent } from "../components/navbar";
 import { ClassData } from "@/components/classData";
 import {
-  ClassificationPrediction,
   ZeroShotClassificationModel,
   ZeroShotResult,
-} from "@visheratin/web-ai";
+} from "@visheratin/web-ai/multimodal";
+import { ClassificationPrediction } from "@visheratin/web-ai/image";
 import FileLoader from "@/components/fileLoader";
 import CodeSnippetModal from "@/components/codeSnippet";
 import IntroComponent from "@/components/intro";

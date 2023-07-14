@@ -2,9 +2,9 @@ import InputFieldsComponent from "@/components/classes";
 import Tooltip from "@/components/tooltip";
 import {
   MultimodalModel,
-  SessionParams,
   ZeroShotClassificationModel,
-} from "@visheratin/web-ai";
+} from "@visheratin/web-ai/multimodal";
+import { SessionParams } from "@visheratin/web-ai";
 import React, { useEffect, useRef, useState } from "react";
 
 interface NavbarComponentProps {

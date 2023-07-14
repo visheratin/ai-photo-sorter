@@ -1,4 +1,4 @@
-import { ClassificationPrediction } from "@visheratin/web-ai";
+import { ClassificationPrediction } from "@visheratin/web-ai/image";
 
 export interface FileInfo {
   name: string;
