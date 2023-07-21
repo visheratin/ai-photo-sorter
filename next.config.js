@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
-const withPWA = require("@imbios/next-pwa")({
+const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
-  fallbacks: {
-    document: "/_offline"
-  },
   runtimeCaching: [
     {
       urlPattern: ({ url }) => {
@@ -12,62 +9,6 @@ const withPWA = require("@imbios/next-pwa")({
       handler: "CacheFirst",
       options: {
         cacheName: "web-ai-models",
-      },
-    },
-    {
-      urlPattern: /\.(?:js)$/i,
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "static-js-assets",
-        expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-      },
-    },
-    {
-      urlPattern: /\.(?:css|less)$/i,
-      handler: "StaleWhileRevalidate",
-      options: {
-        cacheName: "static-style-assets",
-        expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-      },
-    },
-    {
-      urlPattern: /\.(?:ico|json)$/i,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "static-assets",
-        expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-      },
-    },
-    {
-      urlPattern: ({ url }) => {
-        const isSameOrigin = self.origin === url.origin;
-        return !isSameOrigin;
-      },
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "cross-origin",
-        expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 60 * 60, // 1 hour
-        },
-        networkTimeoutSeconds: 10,
-      },
-    },
-    {
-      urlPattern: new RegExp('^/$'),
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "root-path",
-        networkTimeoutSeconds: 5,
       },
     },
   ]
