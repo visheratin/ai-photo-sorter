@@ -1,4 +1,19 @@
 /** @type {import('next').NextConfig} */
+const withPWA = require("@imbios/next-pwa")({
+  dest: "public",
+  runtimeCaching: [
+    {
+      urlPattern: ({ url }) => {
+        return url.origin === 'https://web-ai-models.org';
+      },
+      handler: "CacheFirst",
+      options: {
+        cacheName: "web-ai-models",
+      },
+    },
+  ]
+});
+
 const nextConfig = {
   experimental: {
     appDir: true,
@@ -29,4 +44,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withPWA(nextConfig)
