@@ -59,6 +59,14 @@ const withPWA = require("@imbios/next-pwa")({
         networkTimeoutSeconds: 10,
       },
     },
+    {
+      urlPattern: new RegExp('^/$'),
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "root-path",
+        networkTimeoutSeconds: 5,
+      },
+    },
   ]
 });
 
