@@ -397,7 +397,7 @@ export default function Home() {
   return (
     <>
       <header className="text-center py-6 bg-blue-600 moving-gradient">
-        <h1 className="text-4xl font-semibold">AI photo sorter</h1>
+        <h1 className="text-4xl font-semibold">AI photo organizer</h1>
         <h5 className="text-xl text-white-600 mt-2">
           Organize your photos using the power of neural networks
         </h5>
