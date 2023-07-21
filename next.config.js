@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const withPWA = require("@imbios/next-pwa")({
   dest: "public",
+  fallbacks: {
+    document: "/_offline"
+  },
   runtimeCaching: [
     {
       urlPattern: ({ url }) => {
