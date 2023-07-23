@@ -1,12 +1,19 @@
+"use client";
+import { useTranslation } from "@/app/i18n/client";
 import React from "react";
 
-const FooterComponent = () => {
+interface FooterProps {
+  lng: string;
+}
+
+const FooterComponent = (props: FooterProps) => {
+  const { t } = useTranslation(props.lng, "footer");
   return (
     <footer className="py-6 moving-gradient">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap items-center justify-between">
           <div className="text-sm md:text-base">
-            Powered by{" "}
+            {t("made-with")}
             <a
               href="https://github.com/visheratin/web-ai"
               target="_blank"
