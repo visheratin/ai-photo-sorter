@@ -19,7 +19,7 @@ const FooterComponent = (props: FooterProps) => {
               target="_blank"
               className="text-blue-600 dark:text-blue-500 hover:underline"
             >
-              WebAI
+              Web AI
             </a>
           </div>
           <div>

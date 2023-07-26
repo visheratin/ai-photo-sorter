@@ -1,0 +1,8 @@
+{
+    "classes": "Image classes",
+    "create-class": "Create new class",
+    "edit-class": "Edit class",
+    "class-name": "Name",
+    "class-prompts": "Descriptions (you can define multiple for each class)",
+    "class-save": "Save"
+}
