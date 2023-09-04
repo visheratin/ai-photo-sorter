@@ -1,9 +1,11 @@
-import { useTranslation } from "@/app/i18n";
 import ClassListComponent from "@/components/classList";
 import { ImageClass } from "@/lib/class";
 
-export default async function New({ params }: { params: { lng: string } }) {
-  const { t } = await useTranslation(params.lng, "collections");
+export default function NewCollectionPage({
+  params,
+}: {
+  params: { lng: string };
+}) {
   const data: ImageClass[] = [
     {
       id: "1",

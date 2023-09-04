@@ -2,10 +2,8 @@ import "../globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { dir } from "i18next";
 import { languages } from "../i18n/settings";
-import HeaderComponent from "@/components/header";
 import { useTranslation } from "../i18n";
 import { Metadata } from "next";
-import FooterComponent from "@/components/footer";
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }));
@@ -51,13 +49,7 @@ export async function generateMetadata({
 export default function RootLayout({ children, params: { lng } }) {
   return (
     <html lang={lng} dir={dir(lng)}>
-      <body className="bg-background font-sans">
-        <HeaderComponent lng={lng} />
-        <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col">
-          {children}
-        </main>
-        <FooterComponent lng={lng} />
-      </body>
+      <body className="bg-background font-sans">{children}</body>
       <Analytics />
     </html>
   );

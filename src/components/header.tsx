@@ -6,8 +6,8 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import Link from "next/link";
 import { useTranslation } from "@/app/i18n/client";
+import { Link } from "react-router-dom";
 
 interface HeaderProps {
   lng: string;
@@ -19,7 +19,10 @@ const HeaderComponent = (props: HeaderProps) => {
     <header className="sticky top-0 z-40 w-full border-b moving-gradient backdrop-blur">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Link
+            to={`/${props.lng}/`}
+            className="mr-6 flex items-center space-x-2"
+          >
             <span className="hidden font-bold sm:inline-block">
               Organize AI
             </span>
@@ -28,7 +31,7 @@ const HeaderComponent = (props: HeaderProps) => {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link href="/collections" legacyBehavior passHref>
+              <Link to={`/${props.lng}/collections`}>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   {t("collections")}
                 </NavigationMenuLink>

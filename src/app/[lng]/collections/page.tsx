@@ -1,7 +1,11 @@
-import { useTranslation } from "@/app/i18n";
+import { useTranslation } from "@/app/i18n/client";
 
-export default async function Page({ params }: { params: { lng: string } }) {
-  const { t } = await useTranslation(params.lng, "collections");
+export default function CollectionsPage({
+  params,
+}: {
+  params: { lng: string };
+}) {
+  const { t } = useTranslation(params.lng, "collections");
   return (
     <div className="container pt-10">
       <h1 className="text-4xl font-bold">{t("title")}</h1>

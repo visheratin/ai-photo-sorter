@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const million = require('million/compiler');
+
 const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
   runtimeCaching: [
@@ -42,6 +44,22 @@ const nextConfig = {
       },
     ]
   },
+  async rewrites() {
+    return [
+      {
+        source: '/en/:path*',
+        destination: '/en',
+      },
+      {
+        source: '/ru/:path*',
+        destination: '/ru',
+      },
+    ];
+  },
 }
 
-module.exports = withPWA(nextConfig)
+const millionConfig = {
+  auto: true,
+}
+
+module.exports = million.next(withPWA(nextConfig), millionConfig);
