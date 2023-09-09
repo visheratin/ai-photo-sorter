@@ -9,7 +9,7 @@ interface FooterProps {
 const FooterComponent = (props: FooterProps) => {
   const { t } = useTranslation(props.lng, "footer");
   return (
-    <footer className="py-6 moving-gradient">
+    <footer className="py-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap items-center justify-between">
           <div className="text-sm md:text-base">

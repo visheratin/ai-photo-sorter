@@ -4,5 +4,8 @@
     "edit-class": "Edit class",
     "class-name": "Name",
     "class-prompts": "Descriptions (you can define multiple for each class)",
-    "class-save": "Save"
+    "class-save": "Save",
+    "folders": "Image folders",
+    "dialog-close": "Close",
+    "num-files": "Files"
 }

@@ -56,36 +56,40 @@ const ClassListComponent = (props: ClassListComponentProps) => {
   };
 
   return (
-    <ScrollArea>
+    <>
       <h4 className="mb-1 py-1 font-semibold">{t("classes")}</h4>
-      <div className="grid grid-flow-row auto-rows-max text-sm">
-        {data.map((item) => (
-          <div key={item.id}>
-            <div className="flex justify-between items-center py-1 text-sm">
-              <Button variant="link" size="sm">
-                {item.name}
-              </Button>
-              <div className="flex space-x-2">
-                <Button
-                  variant="ghost"
-                  className="px-1 py-1 h-6"
-                  onClick={() => editClass(item)}
-                >
-                  <Pencil1Icon />
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="px-1 py-1 h-6"
-                  onClick={() => deleteClass(item.id)}
-                >
-                  <TrashIcon />
-                </Button>
+      {data.length !== 0 && (
+        <ScrollArea className="rounded-sm border">
+          <div className="max-h-[450px] grid grid-flow-row auto-rows-max text-sm">
+            {data.map((item) => (
+              <div key={item.id}>
+                <div className="flex justify-between items-center py-1 text-sm">
+                  <Button variant="link" size="sm">
+                    {item.name}
+                  </Button>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="ghost"
+                      className="px-1 py-1 h-6"
+                      onClick={() => editClass(item)}
+                    >
+                      <Pencil1Icon />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="pl-1 pr-3 py-1 h-6"
+                      onClick={() => deleteClass(item.id)}
+                    >
+                      <TrashIcon />
+                    </Button>
+                  </div>
+                </div>
+                <Separator />
               </div>
-            </div>
-            <Separator />
+            ))}
           </div>
-        ))}
-      </div>
+        </ScrollArea>
+      )}
       <div className="mt-2">
         <Button size="sm" className="h-8 px-4" onClick={() => createClass()}>
           <PlusIcon />
@@ -98,7 +102,7 @@ const ClassListComponent = (props: ClassListComponentProps) => {
         onSave={saveClass}
         lng={props.lng}
       />
-    </ScrollArea>
+    </>
   );
 };
 

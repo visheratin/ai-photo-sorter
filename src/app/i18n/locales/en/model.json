@@ -1,0 +1,11 @@
+{
+    "title": "AI status",
+    "status-loading": "Loading",
+    "status-ready": "Ready",
+    "status-error": "Error",
+    "load-model": "Load AI",
+    "load-header": "Do you want to download AI model?",
+    "load-body": "For the application to work, you need to download the model to your computer. The download may take some time because the model weighs about 400 MB. After downloading, the model will be loaded into the browser and will be available for work. Do you want to download the model?",
+    "load-confirm": "Confirm",
+    "load-cancel": "Cancel"
+}

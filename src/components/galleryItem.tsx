@@ -1,12 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from "react";
 import { FileInfo } from "./fileInfo";
 
 interface GalleryItemProps {
   image: FileInfo;
   markDeleted: (src: string) => void;
   openImage: (file: FileInfo) => void;
-  moveToClass: (file: FileInfo | undefined) => void;
 }
 
 const GalleryItem = (props: GalleryItemProps) => {
@@ -15,8 +13,8 @@ const GalleryItem = (props: GalleryItemProps) => {
       <img
         className={
           props.image.toDelete
-            ? "object-cover h-48 w-full grayscale blur-[1px]"
-            : "object-cover h-48 w-full"
+            ? "object-cover h-[220px] w-full grayscale blur-[1px]"
+            : "object-cover h-[220px] w-full"
         }
         src={props.image.src}
         alt=""

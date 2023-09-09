@@ -19,7 +19,7 @@ export default function Page({ params }: { params: { lng: string } }) {
       element: (
         <>
           <HeaderComponent lng={params.lng} />
-          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col">
+          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col bg-background">
             <Link to={`/${params.lng}/collections/new`}>New Collection</Link>
           </main>
           <FooterComponent lng={params.lng} />
@@ -31,7 +31,7 @@ export default function Page({ params }: { params: { lng: string } }) {
       element: (
         <>
           <HeaderComponent lng={params.lng} />
-          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col">
+          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col bg-background">
             <CollectionsPage params={{ lng: params.lng }} />
           </main>
           <FooterComponent lng={params.lng} />
@@ -43,7 +43,7 @@ export default function Page({ params }: { params: { lng: string } }) {
       element: (
         <>
           <HeaderComponent lng={params.lng} />
-          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col">
+          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col bg-background">
             <NewCollectionPage params={{ lng: params.lng }} />
           </main>
           <FooterComponent lng={params.lng} />
