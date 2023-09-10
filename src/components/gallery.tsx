@@ -7,7 +7,6 @@ import Resizer from "react-image-file-resizer";
 import { Button } from "./ui/button";
 import { useTranslation } from "@/app/i18n/client";
 import { ScrollArea } from "./ui/scroll-area";
-import { VercelLogoIcon } from "@radix-ui/react-icons";
 
 interface PhotoGalleryProps {
   images: FileSystemFileHandle[];
@@ -19,8 +18,8 @@ const resizeFile = (file: File): Promise<File> =>
   new Promise((resolve) => {
     Resizer.imageFileResizer(
       file,
-      600,
-      600,
+      800,
+      800,
       "JPEG",
       80,
       0,
@@ -50,6 +49,48 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(props.images.length / threshold);
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeImage();
+      }
+    };
+    window.addEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+    };
+  }, []);
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        if (selectedImage) {
+          const index = currentImages.findIndex(
+            (item) => item === selectedImage
+          );
+          if (index <= 0) return;
+          setSelectedImage(currentImages[index - 1]);
+        } else {
+          goToPreviousPage();
+        }
+      } else if (event.key === "ArrowRight") {
+        if (selectedImage) {
+          const index = currentImages.findIndex(
+            (item) => item === selectedImage
+          );
+          if (index === currentImages.length - 1 || index === -1) return;
+          setSelectedImage(currentImages[index + 1]);
+        } else {
+          goToNextPage();
+        }
+      }
+    };
+    window.addEventListener("keydown", listener);
+    return () => {
+      window.removeEventListener("keydown", listener);
+    };
+  });
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {

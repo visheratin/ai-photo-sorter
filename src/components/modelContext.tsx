@@ -34,7 +34,6 @@ export const ModelContextProvider: React.FunctionComponent<
   });
 
   const init = async () => {
-    console.log("init");
     setInstance({
       model: null,
       status: ModelStatus.Loading,

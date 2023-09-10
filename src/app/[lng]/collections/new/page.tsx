@@ -2,13 +2,6 @@
 import ClassListComponent from "@/components/classList";
 import FoldersListComponent from "@/components/foldersList";
 import PhotoGallery from "@/components/gallery";
-import { ImageClass } from "@/lib/class";
-import { isPropertySignature } from "typescript";
-
-import {
-  ZeroShotClassificationModel,
-  ModelType,
-} from "@visheratin/web-ai/multimodal";
 import { useState } from "react";
 
 export default function NewCollectionPage({

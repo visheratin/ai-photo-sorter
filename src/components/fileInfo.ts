@@ -1,5 +1,3 @@
-import { ClassificationPrediction } from "@visheratin/web-ai/image";
-
 export interface FileInfo {
   id: string;
   name: string;
