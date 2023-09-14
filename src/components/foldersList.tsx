@@ -1,6 +1,6 @@
 "use client";
 import { useTranslation } from "@/app/i18n/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Separator } from "./ui/separator";
@@ -17,6 +17,7 @@ interface FoldersListProps {
   lng: string;
   addFolderFiles: (files: FileSystemFileHandle[]) => void;
   removeFolderFiles: (files: FileSystemFileHandle[]) => void;
+  setDirHandles: (dirHandles: FileSystemDirectoryHandle[]) => void;
 }
 
 const FoldersListComponent = (props: FoldersListProps) => {
@@ -86,6 +87,10 @@ const FoldersListComponent = (props: FoldersListProps) => {
       return updatedFolders;
     });
   };
+
+  useEffect(() => {
+    props.setDirHandles(folders.map((item) => item.handle));
+  }, [folders, props]);
 
   return (
     <>

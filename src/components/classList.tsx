@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "./ui/button";
 import { PlusIcon, Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ClassEditor from "./classEdit";
 import { v4 as uuidv4 } from "uuid";
 import { useTranslation } from "@/app/i18n/client";
@@ -12,17 +12,26 @@ import { useTranslation } from "@/app/i18n/client";
 interface ClassListComponentProps {
   data: ImageClass[];
   lng: string;
+  setClasses: (classes: ImageClass[]) => void;
 }
 
 const ClassListComponent = (props: ClassListComponentProps) => {
   const { t } = useTranslation(props.lng, "collection");
-  const [data, setData] = useState<ImageClass[]>(props.data);
+  const [classes, setClasses] = useState<ImageClass[]>(props.data);
   const [editItem, setEditItem] = useState<ImageClass>({
     id: "",
     name: "",
     prompts: [],
   });
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setClasses(props.data);
+  }, []);
+
+  useEffect(() => {
+    props.setClasses(classes);
+  }, [props, classes]);
 
   const createClass = () => {
     const item = {
@@ -40,28 +49,28 @@ const ClassListComponent = (props: ClassListComponentProps) => {
   };
 
   const deleteClass = (id: string) => {
-    const updatedData = data.filter((item) => item.id !== id);
-    setData(updatedData);
+    const updatedData = classes.filter((item) => item.id !== id);
+    setClasses(updatedData);
   };
 
   const saveClass = (item: ImageClass) => {
-    const updatedData = data.map((dataItem) =>
+    const updatedData = classes.map((dataItem) =>
       dataItem.id === item.id ? item : dataItem
     );
     if (item.id === "") {
       item.id = uuidv4();
       updatedData.push(item);
     }
-    setData(updatedData);
+    setClasses(updatedData);
   };
 
   return (
     <>
       <h4 className="mb-1 py-1 font-semibold">{t("classes")}</h4>
-      {data.length !== 0 && (
+      {classes.length !== 0 && (
         <ScrollArea className="rounded-sm border">
           <div className="max-h-[450px] grid grid-flow-row auto-rows-max text-sm">
-            {data.map((item) => (
+            {classes.map((item) => (
               <div key={item.id}>
                 <div className="flex justify-between items-center py-1 text-sm">
                   <Button variant="link" size="sm">

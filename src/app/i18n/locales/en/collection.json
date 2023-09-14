@@ -7,5 +7,7 @@
     "class-save": "Save",
     "folders": "Image folders",
     "dialog-close": "Close",
-    "num-files": "Files"
+    "num-files": "Files",
+    "title": "Title",
+    "create-new": "Create"
 }

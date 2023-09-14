@@ -12,6 +12,7 @@ interface PhotoGalleryProps {
   images: FileSystemFileHandle[];
   markDeleted: (src: string) => void;
   lng: string;
+  simple: boolean;
 }
 
 const resizeFile = (file: File): Promise<File> =>
@@ -179,6 +180,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
                 key={image.id}
                 openImage={openImage}
                 markDeleted={props.markDeleted}
+                simple={props.simple}
               />
             ))}
             {Array.from(Array(placeholdersNum).keys()).map((index) => (

@@ -7,5 +7,7 @@
     "class-save": "Сохранить",
     "folders": "Папки с изображениями",
     "dialog-close": "Закрыть",
-    "num-files": "Файлов"
+    "num-files": "Файлов",
+    "title": "Название",
+    "create-new": "Создать"
 }
