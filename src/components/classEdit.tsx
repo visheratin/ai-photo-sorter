@@ -1,4 +1,4 @@
-import { ImageClass } from "@/lib/class";
+import { ClassPrompt, ImageClass } from "@/lib/class";
 import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
 import { Label } from "./ui/label";
@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { InputData } from "./inputData";
 import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { v4 as uuidv4 } from "uuid";
 import { useTranslation } from "@/app/i18n/client";
@@ -25,20 +24,22 @@ interface ClassEditorProps {
 
 const ClassEditor = (props: ClassEditorProps) => {
   const nameRef = useRef<HTMLInputElement>(null);
-  const [prompts, setPrompts] = useState<InputData[]>([]);
+  const [prompts, setPrompts] = useState<ClassPrompt[]>([]);
   const { t } = useTranslation(props.lng, "collection");
 
   useEffect(() => {
     const prompts = props.item.prompts.map((prompt) => ({
-      id: uuidv4(),
-      value: prompt,
+      id: prompt.id,
+      text: prompt.text,
+      vector: prompt.vector,
     }));
-    if (prompts.length === 0) prompts.push({ id: uuidv4(), value: "" });
+    if (prompts.length === 0)
+      prompts.push({ id: uuidv4(), text: "", vector: [] });
     setPrompts(prompts);
   }, [props.item]);
 
   const addInputField = () => {
-    const newPrompt = { id: uuidv4(), value: "" };
+    const newPrompt: ClassPrompt = { id: uuidv4(), text: "", vector: [] };
     setPrompts((prevPrompts) => {
       const updatedPrompts = [...prevPrompts];
       updatedPrompts.push(newPrompt);
@@ -49,19 +50,19 @@ const ClassEditor = (props: ClassEditorProps) => {
     });
   };
 
-  const handleInputChange = (id: number, value: string) => {
+  const handleInputChange = (id: string, value: string) => {
     const updatedInputs = prompts.map((input) =>
-      input.id === id ? { ...input, value } : input
+      input.id === id ? { ...input, text: value } : input
     );
     setPrompts(updatedInputs);
   };
 
-  const removePrompt = (id: number) => {
+  const removePrompt = (id: string) => {
     const updatedPrompts = prompts.filter((prompt) => prompt.id !== id);
     setPrompts(updatedPrompts);
   };
 
-  const focusInput = (id: number) => {
+  const focusInput = (id: string) => {
     const inputElement = document.getElementById(
       `prompt-${id}`
     ) as HTMLInputElement;
@@ -70,12 +71,11 @@ const ClassEditor = (props: ClassEditorProps) => {
 
   const saveChanges = () => {
     if (!nameRef.current) return;
-    const item = {
+    const item: ImageClass = {
       id: props.item.id,
       name: nameRef.current.value,
-      prompts: prompts.map((prompt) => prompt.value),
+      prompts: prompts,
     };
-    console.log(item);
     props.onSave(item);
     props.setOpen(false);
   };
@@ -106,7 +106,7 @@ const ClassEditor = (props: ClassEditorProps) => {
             >
               <Input
                 id={`prompt-${prompt.id}`}
-                value={prompt.value}
+                value={prompt.text}
                 onChange={(e) => handleInputChange(prompt.id, e.target.value)}
                 type="text"
               />

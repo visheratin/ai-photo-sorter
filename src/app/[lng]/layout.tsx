@@ -4,8 +4,6 @@ import { dir } from "i18next";
 import { languages } from "../i18n/settings";
 import { useTranslation } from "../i18n";
 import { Metadata } from "next";
-import { ModelContextProvider } from "@/components/modelContext";
-import { DatabaseContextProvider } from "@/components/databaseContext";
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }));
@@ -51,13 +49,9 @@ export async function generateMetadata({
 export default function RootLayout({ children, params: { lng } }) {
   return (
     <html lang={lng} dir={dir(lng)}>
-      <DatabaseContextProvider>
-        <ModelContextProvider>
-          <body className="font-sans moving-gradient backdrop-blur">
-            {children}
-          </body>
-        </ModelContextProvider>
-      </DatabaseContextProvider>
+      <body className="font-sans moving-gradient backdrop-blur">
+        {children}
+      </body>
       <Analytics />
     </html>
   );

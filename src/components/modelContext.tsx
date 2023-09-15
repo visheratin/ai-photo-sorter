@@ -1,74 +1,57 @@
 "use client";
+import { Collection } from "@/lib/collection";
 import {
   ZeroShotClassificationModel,
   MultimodalModel,
 } from "@visheratin/web-ai/multimodal";
-import { createContext, useEffect, useState } from "react";
+import { create } from "zustand";
+import { Database } from "@/lib/database";
 
 export enum ModelStatus {
   Unknown,
   Loading,
   Ready,
+  Processing,
   Error,
 }
 
-export interface ModelInfo {
+export interface ModelState {
   model: ZeroShotClassificationModel | null;
   status: ModelStatus;
-  createModel: () => Promise<void>;
+  init: () => Promise<void>;
+  processCollection: (collection: Collection) => Promise<void>;
 }
 
-export const ModelContext = createContext<ModelInfo | null>(null);
-
-interface ModelContextProviderProps {
-  children: React.ReactNode;
-}
-
-export const ModelContextProvider: React.FunctionComponent<
-  ModelContextProviderProps
-> = ({ children }) => {
-  const [instance, setInstance] = useState<ModelInfo>({
-    model: null,
-    status: ModelStatus.Unknown,
-    createModel: async () => {},
-  });
-
-  const init = async () => {
-    setInstance({
-      model: null,
-      status: ModelStatus.Loading,
-      createModel: init,
-    });
+export const useModelStore = create<ModelState>((set, get) => ({
+  model: null,
+  status: ModelStatus.Unknown,
+  init: async () => {
+    set({ status: ModelStatus.Loading });
     try {
       const result = await MultimodalModel.create("nllb-clip-base");
-      setInstance({
+      set({
         model: result.model as ZeroShotClassificationModel,
         status: ModelStatus.Ready,
-        createModel: init,
       });
     } catch (e) {
       console.error(e);
-      setInstance({
-        model: null,
-        status: ModelStatus.Error,
-        createModel: init,
-      });
+      set({ model: null, status: ModelStatus.Error });
     }
-  };
-
-  useEffect(() => {
-    if (localStorage.getItem("model-set") !== null) {
-      init();
-    } else {
-      setInstance({
-        model: null,
-        status: ModelStatus.Unknown,
-        createModel: init,
-      });
+  },
+  processCollection: async (collection: Collection) => {
+    const model = get().model;
+    if (!model) return;
+    set({ status: ModelStatus.Processing });
+    for (let i = 0; i < collection.classes.length; i++) {
+      const classItem = collection.classes[i];
+      for (let j = 0; j < classItem.prompts.length; j++) {
+        const prompt = classItem.prompts[j];
+        const result = await model.embedTexts(prompt.text);
+        prompt.vector = result ? result[0] : [];
+        collection.classes[i].prompts[j] = prompt;
+      }
     }
-  }, []);
-
-  return (
-    <ModelContext.Provider value={instance}>{children}</ModelContext.Provider>
-  );
-};
+    Database.updateCollection(collection);
+    set({ status: ModelStatus.Ready });
+  },
+}));

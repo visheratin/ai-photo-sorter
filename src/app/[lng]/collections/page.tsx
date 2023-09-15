@@ -1,6 +1,7 @@
+"use client";
 import { useTranslation } from "@/app/i18n/client";
-import { DatabaseContext } from "@/components/databaseContext";
-import { useContext, useEffect } from "react";
+import { Database } from "@/lib/database";
+import { useEffect } from "react";
 
 export default function CollectionsPage({
   params,
@@ -9,10 +10,8 @@ export default function CollectionsPage({
 }) {
   const { t } = useTranslation(params.lng, "collections");
 
-  const databaseContext = useContext(DatabaseContext);
-
   const load = async () => {
-    const collections = await databaseContext.current?.listCollections();
+    const collections = await Database.listCollections();
     console.log(collections);
   };
 

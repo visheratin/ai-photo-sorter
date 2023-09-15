@@ -1,17 +1,18 @@
 "use client";
 import { useTranslation } from "@/app/i18n/client";
 import ClassListComponent from "@/components/classList";
-import { DatabaseContext } from "@/components/databaseContext";
 import FoldersListComponent from "@/components/foldersList";
 import PhotoGallery from "@/components/gallery";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageClass } from "@/lib/class";
 import { Collection } from "@/lib/collection";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
 import { Navigate } from "react-router-dom";
+import { Database } from "@/lib/database";
+import { useModelStore } from "@/components/modelContext";
 
 export default function NewCollectionPage({
   params,
@@ -20,7 +21,7 @@ export default function NewCollectionPage({
 }) {
   const { t } = useTranslation(params.lng, "collection");
 
-  const databaseContext = useContext(DatabaseContext);
+  const modelStore = useModelStore();
 
   const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>([]);
   const [dirHandles, setDirHandles] = useState<FileSystemDirectoryHandle[]>([]);
@@ -56,8 +57,9 @@ export default function NewCollectionPage({
       classes: classes,
       dirHandles: dirHandles,
     };
-    await databaseContext.current?.createCollection(collection);
+    await Database.createCollection(collection);
     setCollectionCreated(true);
+    modelStore.processCollection(collection);
   };
 
   return (

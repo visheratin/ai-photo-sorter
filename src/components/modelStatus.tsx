@@ -1,6 +1,6 @@
+"use client";
 import { useTranslation } from "@/app/i18n/client";
-import { ModelContext, ModelStatus } from "./modelContext";
-import { useContext } from "react";
+import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ModelStatus, useModelStore } from "./modelContext";
 
 interface ModelStatusProps {
   lng: string;
@@ -22,26 +23,30 @@ interface ModelStatusProps {
 const ModelStatusComponent = (props: ModelStatusProps) => {
   const { t } = useTranslation(props.lng, "model");
 
-  const modelContext = useContext(ModelContext);
+  const modelStore = useModelStore();
 
   const initContext = async () => {
     localStorage.setItem("model-set", "true");
-    await modelContext?.createModel();
+    await modelStore.init();
   };
-
-  if (!modelContext) return null;
 
   let color = "green-500";
 
-  switch (modelContext.status) {
+  switch (modelStore.status) {
     case ModelStatus.Error:
       color = "red-500";
       break;
   }
 
+  useEffect(() => {
+    if (localStorage.getItem("model-set") !== null) {
+      modelStore.init();
+    }
+  }, []);
+
   return (
     <div className="flex items-center space-x-2">
-      {modelContext.status === ModelStatus.Unknown ? (
+      {modelStore.status === ModelStatus.Unknown ? (
         <>
           <AlertDialog>
             <AlertDialogTrigger>
@@ -66,8 +71,10 @@ const ModelStatusComponent = (props: ModelStatusProps) => {
       ) : (
         <>
           <span className="text-sm font-medium">{t("title")}:</span>
-          {modelContext.status === ModelStatus.Loading ? (
+          {modelStore.status === ModelStatus.Loading ? (
             <Loader2 className="w-3 h-3 text-gray-700 animate-spin" />
+          ) : modelStore.status === ModelStatus.Processing ? (
+            <Loader2 className="w-3 h-3 text-green-500 animate-spin" />
           ) : (
             <span className={`w-3 h-3 rounded-full bg-${color}`}></span>
           )}
