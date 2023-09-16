@@ -1,4 +1,9 @@
 {
     "title": "My collections",
-    "add-new": "Add new"
+    "add-new": "Add new",
+    "table-title": "Title",
+    "table-number": "# files",
+    "table-time": "Update time",
+    "create-new": "Create new collection",
+    "locale": "en-US"
 }

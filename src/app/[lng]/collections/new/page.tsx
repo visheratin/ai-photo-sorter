@@ -70,6 +70,7 @@ export default function NewCollectionPage({
     const collection: Collection = {
       id: uuidv4(),
       title: title,
+      filesNumber: fileInfos.length,
       serializedIndex: "",
       classes: classes,
       dirHandles: dirHandles,
