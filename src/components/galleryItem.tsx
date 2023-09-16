@@ -1,10 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import { FileInfo } from "./fileInfo";
+import { GalleryFile } from "./galleryFile";
 
 interface GalleryItemProps {
-  image: FileInfo;
+  image: GalleryFile;
   markDeleted: (src: string) => void;
-  openImage: (file: FileInfo) => void;
+  openImage: (file: GalleryFile) => void;
   simple: boolean;
 }
 

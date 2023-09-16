@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Resizer from "react-image-file-resizer";
-import { FileInfo } from "./fileInfo";
+import { GalleryFile } from "./galleryFile";
 import md5 from "md5";
 
 interface FileLoaderProps {
-  setNewFiles: (files: FileInfo[]) => void;
+  setNewFiles: (files: GalleryFile[]) => void;
 }
 
 const FileLoader = (props: FileLoaderProps) => {
@@ -32,13 +32,11 @@ const FileLoader = (props: FileLoaderProps) => {
       setLoading(true);
       for (const file of acceptedFiles) {
         const resizedFile = await resizeFile(file);
-        const info: FileInfo = {
+        const info: GalleryFile = {
+          id: md5(file.name),
           name: file.name,
           src: URL.createObjectURL(resizedFile),
-          hash: md5(resizedFile.name + resizedFile.size),
-          embedding: null,
           toDelete: false,
-          classPredictions: [],
         };
         props.setNewFiles([info]);
       }

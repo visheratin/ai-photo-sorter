@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import PhotoGallery from "@/components/gallery";
-import { FileInfo } from "@/components/fileInfo";
+import { GalleryFile } from "@/components/galleryFile";
 import { NavbarComponent } from "../components/navbar";
 import { ClassData } from "@/components/classData";
 import {
@@ -19,9 +19,9 @@ import ClassSelector from "@/components/classSelector";
 export default function Home() {
   const [classNames, setClassNames] = useState<string[]>([]);
 
-  const [unsortedFiles, setUnsortedFiles] = useState<FileInfo[]>([]);
+  const [unsortedFiles, setUnsortedFiles] = useState<GalleryFile[]>([]);
 
-  const [files, setFiles] = useState<FileInfo[]>([]);
+  const [files, setFiles] = useState<GalleryFile[]>([]);
 
   const [classFiles, setClassFiles] = useState<ClassData[]>([]);
 
@@ -33,19 +33,19 @@ export default function Home() {
 
   const toStop = useRef(false);
 
-  const [movingFile, setMovingFile] = useState<FileInfo | undefined>();
+  const [movingFile, setMovingFile] = useState<GalleryFile | undefined>();
 
   const [showMoveModal, setShowMoveModal] = useState(false);
 
-  const setNewFiles = (newFiles: FileInfo[]) => {
+  const setNewFiles = (newFiles: GalleryFile[]) => {
     const existingFiles = files.map((file) => file.hash);
     const filteredNewFiles = newFiles.filter(
       (file) => !existingFiles.includes(file.hash)
     );
-    setUnsortedFiles((prevFiles: FileInfo[]) => {
+    setUnsortedFiles((prevFiles: GalleryFile[]) => {
       return [...prevFiles, ...filteredNewFiles];
     });
-    setFiles((prevFiles: FileInfo[]) => {
+    setFiles((prevFiles: GalleryFile[]) => {
       return [...prevFiles, ...filteredNewFiles];
     });
   };
@@ -150,7 +150,7 @@ export default function Home() {
   };
 
   const processResult = (
-    file: FileInfo,
+    file: GalleryFile,
     result: ClassificationPrediction[],
     embedding: number[],
     classData: ClassData[],
@@ -168,7 +168,7 @@ export default function Home() {
     const foundClassIndex = classes.indexOf(foundClass);
     classData[foundClassIndex].files.push(file);
     setClassFiles([...classData]);
-    setUnsortedFiles((prevFiles: FileInfo[]) => {
+    setUnsortedFiles((prevFiles: GalleryFile[]) => {
       const unsortedIdx = prevFiles.indexOf(file);
       prevFiles.splice(unsortedIdx, 1);
       return [...prevFiles];
@@ -195,7 +195,7 @@ export default function Home() {
     const result: ClassData[] = [];
     clsFiles.forEach((classData: ClassData) => {
       const files = classData.files;
-      const duplicates: FileInfo[][] = [];
+      const duplicates: GalleryFile[][] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         let dupeFound = false;
@@ -229,7 +229,7 @@ export default function Home() {
             file2.embedding as number[]
           );
           if (sim > 0.9) {
-            const dupe: FileInfo[] = [file, file2];
+            const dupe: GalleryFile[] = [file, file2];
             duplicates.push(dupe);
             files.splice(j, 1);
             files.splice(i, 1);
@@ -339,12 +339,12 @@ export default function Home() {
     toStop.current = true;
   };
 
-  const startFileMoving = (file: FileInfo | undefined) => {
+  const startFileMoving = (file: GalleryFile | undefined) => {
     setMovingFile(file);
     setShowMoveModal(true);
   };
 
-  const moveToClass = (file: FileInfo, clsName: string) => {
+  const moveToClass = (file: GalleryFile, clsName: string) => {
     console.log(`Moving ${file.name} to ${clsName}`);
     const clsFiles = [...classFiles];
     let currentClass = "";

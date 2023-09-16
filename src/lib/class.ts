@@ -1,7 +1,10 @@
+import { FileInfo } from "./info";
+
 export interface ImageClass {
   id: string;
   name: string;
   prompts: ClassPrompt[];
+  files: FileInfo[];
 }
 
 export interface ClassPrompt {

@@ -41,6 +41,7 @@ const ModelStatusComponent = (props: ModelStatusProps) => {
   useEffect(() => {
     if (localStorage.getItem("model-set") !== null) {
       modelStore.init();
+      modelStore.setLanguage(props.lng);
     }
   }, []);
 

@@ -75,6 +75,7 @@ const ClassEditor = (props: ClassEditorProps) => {
       id: props.item.id,
       name: nameRef.current.value,
       prompts: prompts,
+      files: [],
     };
     props.onSave(item);
     props.setOpen(false);

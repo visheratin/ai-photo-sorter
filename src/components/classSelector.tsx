@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { FileInfo } from "./fileInfo";
+import React from "react";
+import { GalleryFile } from "./galleryFile";
 
 interface ClassSelectorProps {
-  file: FileInfo | undefined;
+  file: GalleryFile | undefined;
   classes: string[];
-  onClassSet: (file: FileInfo, className: string) => void;
+  onClassSet: (file: GalleryFile, className: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }

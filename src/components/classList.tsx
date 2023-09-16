@@ -22,6 +22,7 @@ const ClassListComponent = (props: ClassListComponentProps) => {
     id: "",
     name: "",
     prompts: [],
+    files: [],
   });
   const [open, setOpen] = useState(false);
 
@@ -38,6 +39,7 @@ const ClassListComponent = (props: ClassListComponentProps) => {
       id: "",
       name: "",
       prompts: [],
+      files: [],
     };
     setEditItem(item);
     setOpen(true);

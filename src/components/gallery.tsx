@@ -1,9 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FileInfo } from "./fileInfo";
+import { GalleryFile, resizeFile } from "./galleryFile";
 import GalleryItem from "./galleryItem";
 import { v4 as uuidv4 } from "uuid";
-import Resizer from "react-image-file-resizer";
 import { Button } from "./ui/button";
 import { useTranslation } from "@/app/i18n/client";
 import { ScrollArea } from "./ui/scroll-area";
@@ -15,25 +14,9 @@ interface PhotoGalleryProps {
   simple: boolean;
 }
 
-const resizeFile = (file: File): Promise<File> =>
-  new Promise((resolve) => {
-    Resizer.imageFileResizer(
-      file,
-      800,
-      800,
-      "JPEG",
-      80,
-      0,
-      (uri) => {
-        resolve(uri as File);
-      },
-      "file"
-    );
-  });
-
 const PhotoGallery = (props: PhotoGalleryProps) => {
   const { t } = useTranslation(props.lng, "gallery");
-  const [selectedImage, setSelectedImage] = useState<FileInfo | undefined>(
+  const [selectedImage, setSelectedImage] = useState<GalleryFile | undefined>(
     undefined
   );
 
@@ -43,7 +26,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
 
   const threshold = 30;
 
-  const [currentImages, setCurrentImages] = useState<FileInfo[]>([]);
+  const [currentImages, setCurrentImages] = useState<GalleryFile[]>([]);
 
   const [placeholdersNum, setPlaceholdersNum] = useState(0);
 
@@ -114,7 +97,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
       let num = limit;
       setCurrentImages([]);
       setPlaceholdersNum(num);
-      const newImages: FileInfo[] = [];
+      const newImages: GalleryFile[] = [];
       const currentVersion = version.current;
       for (let i = offset; i < offset + limit; i++) {
         if (version.current !== currentVersion) return;
@@ -126,8 +109,6 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
               id: uuidv4(),
               name: props.images[i].name,
               src: URL.createObjectURL(file),
-              hash: "",
-              embedding: null,
               toDelete: false,
             });
             setCurrentImages(newImages);
@@ -143,8 +124,6 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
           id: uuidv4(),
           name: props.images[i].name,
           src: URL.createObjectURL(resizedFile),
-          hash: "",
-          embedding: null,
           toDelete: false,
         });
         if (version.current !== currentVersion) return;
@@ -161,7 +140,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
     updateImages((currentPage - 1) * threshold, threshold);
   }, [currentPage, updateImages]);
 
-  const openImage = (file: FileInfo) => {
+  const openImage = (file: GalleryFile) => {
     setSelectedImage(file);
   };
 

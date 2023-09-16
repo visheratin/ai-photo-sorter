@@ -26,7 +26,7 @@
     "@types/react-dom": "18.0.11",
     "@vercel/analytics": "^0.1.11",
     "@visheratin/tokenizers": "^0.1.5",
-    "@visheratin/web-ai": "^1.4.0",
+    "@visheratin/web-ai": "^1.4.1",
     "accept-language": "^3.0.18",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
@@ -55,6 +55,7 @@
     "tinybase": "^4.2.1",
     "typescript": "5.0.2",
     "uuid": "^9.0.0",
+    "voy-search": "^0.6.2",
     "zod": "^3.21.4",
     "zustand": "^4.4.1"
   },

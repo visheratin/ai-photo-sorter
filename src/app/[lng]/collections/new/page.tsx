@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Navigate } from "react-router-dom";
 import { Database } from "@/lib/database";
 import { useModelStore } from "@/components/modelContext";
+import { FileInfo } from "@/lib/info";
 
 export default function NewCollectionPage({
   params,
@@ -23,20 +24,20 @@ export default function NewCollectionPage({
 
   const modelStore = useModelStore();
 
-  const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>([]);
+  const [files, setFiles] = useState<FileSystemFileHandle[]>([]);
   const [dirHandles, setDirHandles] = useState<FileSystemDirectoryHandle[]>([]);
   const [classes, setClasses] = useState<ImageClass[]>([]);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [collectionCreated, setCollectionCreated] = useState(false);
 
-  const addFileHandles = (files: FileSystemFileHandle[]) => {
-    setFileHandles([...fileHandles, ...files]);
+  const addFileHandles = (newFiles: FileSystemFileHandle[]) => {
+    setFiles([...files, ...newFiles]);
   };
 
-  const removeFileHandles = (files: FileSystemFileHandle[]) => {
-    const updatedData = fileHandles.filter((item) => {
+  const removeFileHandles = (deleteFiles: FileSystemFileHandle[]) => {
+    const updatedData = deleteFiles.filter((item) => {
       let exists = false;
-      for (const file of files) {
+      for (const file of deleteFiles) {
         if (file === item) {
           exists = true;
           break;
@@ -44,18 +45,36 @@ export default function NewCollectionPage({
       }
       return !exists;
     });
-    setFileHandles(updatedData);
+    setFiles(updatedData);
+  };
+
+  const getFileInfo = async (fileHandles: FileSystemFileHandle[]) => {
+    const fileInfos: FileInfo[] = [];
+    for (const handle of fileHandles) {
+      const file = await handle.getFile();
+      const fileInfo: FileInfo = {
+        id: uuidv4(),
+        name: file.name,
+        handle: handle,
+        updateTime: file.lastModified,
+      };
+      fileInfos.push(fileInfo);
+    }
+    return fileInfos;
   };
 
   const create = async () => {
     const title = titleInputRef.current?.value;
     if (!title) return;
+    const fileInfos = await getFileInfo(files);
     const collection: Collection = {
       id: uuidv4(),
       title: title,
       serializedIndex: "",
       classes: classes,
       dirHandles: dirHandles,
+      unsortedFiles: fileInfos,
+      updateTime: new Date().getTime(),
     };
     await Database.createCollection(collection);
     setCollectionCreated(true);
@@ -64,9 +83,7 @@ export default function NewCollectionPage({
 
   return (
     <>
-      {collectionCreated && (
-        <Navigate to={`/${params.lng}/collections`} replace={true} />
-      )}
+      {collectionCreated && <Navigate to={`/${params.lng}/collections`} />}
       <div className="container-full px-10 pt-3 pb-3">
         <div className="grid gap-4 md:grid-cols-6 mt-4">
           <div>
@@ -90,7 +107,7 @@ export default function NewCollectionPage({
           </div>
           <div className="md:col-span-5">
             <PhotoGallery
-              images={fileHandles}
+              images={files}
               markDeleted={() => {}}
               lng={params.lng}
               simple={true}

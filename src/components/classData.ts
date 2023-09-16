@@ -1,7 +1,7 @@
-import { FileInfo } from "./fileInfo";
+import { GalleryFile } from "./galleryFile";
 
 export interface ClassData {
   name: string;
-  files: FileInfo[];
+  files: GalleryFile[];
   duplicates: ClassData[];
 }
