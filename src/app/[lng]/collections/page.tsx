@@ -54,7 +54,9 @@ export default function CollectionsPage({
           <TableBody>
             {collections.map((collection) => (
               <TableRow key={collection.id}>
-                <Link to={`/${params.lng}/collections/${collection.id}`}>
+                <Link
+                  to={`/${params.lng}/collections/view?id=${collection.id}`}
+                >
                   <TableCell>{collection.title}</TableCell>
                 </Link>
                 <TableCell>{collection.filesNumber}</TableCell>

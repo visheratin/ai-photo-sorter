@@ -49,9 +49,7 @@ export async function generateMetadata({
 export default function RootLayout({ children, params: { lng } }) {
   return (
     <html lang={lng} dir={dir(lng)}>
-      <body className="font-sans moving-gradient backdrop-blur">
-        {children}
-      </body>
+      <body className="font-sans">{children}</body>
       <Analytics />
     </html>
   );

@@ -57,6 +57,7 @@ export default function NewCollectionPage({
         name: file.name,
         handle: handle,
         updateTime: file.lastModified,
+        embedding: [],
       };
       fileInfos.push(fileInfo);
     }

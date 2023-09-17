@@ -5,6 +5,7 @@ export interface ImageClass {
   name: string;
   prompts: ClassPrompt[];
   files: FileInfo[];
+  classVectors: number[][];
 }
 
 export interface ClassPrompt {

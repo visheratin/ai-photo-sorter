@@ -151,7 +151,7 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
   return (
     <div>
       <ScrollArea>
-        <div className="h-[calc(100vh-15.5rem)]">
+        <div>
           <div className="grid grid-cols-2 2xl:grid-cols-10 md:grid-cols-5 gap-4">
             {currentImages.map((image, index) => (
               <GalleryItem

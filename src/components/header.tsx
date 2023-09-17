@@ -17,7 +17,7 @@ interface HeaderProps {
 const HeaderComponent = (props: HeaderProps) => {
   const { t } = useTranslation(props.lng, "header");
   return (
-    <header className="sticky top-0 z-40 w-full border-b">
+    <header className="sticky top-0 z-40 w-full border-b moving-gradient backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex">
           <div className="mr-4 hidden md:flex">

@@ -6,7 +6,6 @@ import {
 } from "@visheratin/web-ai/multimodal";
 import { create } from "zustand";
 import { Database } from "@/lib/database";
-import { EmbeddedResource } from "voy-search";
 import { resizeFile } from "./galleryFile";
 import { FileInfo } from "@/lib/info";
 import { langMap } from "@/lib/langMap";
@@ -66,52 +65,82 @@ export const useModelStore = create<ModelState>((set, get) => ({
         collection.classes[i].prompts[j] = prompt;
       }
     }
-    const embeddings = await processFiles(collection.unsortedFiles, model);
-    const { Voy } = await import("voy-search");
-    const index = new Voy({ embeddings: embeddings });
-    collection.serializedIndex = index.serialize();
-    await classify(collection, embeddings, model);
+    let allFiles = collection.unsortedFiles;
+    for (let cls of collection.classes) {
+      allFiles.push(...cls.files);
+    }
+    allFiles.sort((a, b) => a.updateTime - b.updateTime);
+    const noEmbedFiles = allFiles.filter((item) => item.embedding.length === 0);
+    const embeddings = await processFiles(noEmbedFiles, model);
+    const embedFiles = allFiles.filter((item) => item.embedding.length > 0);
+    allFiles = [...embedFiles, ...noEmbedFiles];
+    // const { Voy } = await import("voy-search");
+    // const index = new Voy({ embeddings: embeddings });
+    // collection.serializedIndex = index.serialize();
+    await classify(collection, embeddings, model, allFiles);
     Database.updateCollection(collection);
     set({ status: ModelStatus.Ready });
+  },
+  getImageEmbedding: async (fileInfo: FileInfo) => {
+    const model = get().model;
+    if (!model) return;
+    const embeddings = await processFiles([fileInfo], model);
+    return embeddings[0];
+  },
+  getTextEmbedding: async (text: string) => {
+    const model = get().model;
+    if (!model) return;
+    const lang = get().language;
+    const langID = langMap.get(lang);
+    if (!langID) return;
+    const result = await model.embedTexts(`${langID} ${text}`);
+    return result ? result[0] : [];
   },
 }));
 
 const classify = async (
   collection: Collection,
-  embeddings: EmbeddedResource[],
-  model: ZeroShotClassificationModel
+  embeddings: number[][],
+  model: ZeroShotClassificationModel,
+  allFiles: FileInfo[]
 ) => {
   const newUnsorted = [];
-  const textVectors = [];
+  const checkVectors = [];
   for (const classItem of collection.classes) {
     for (const prompt of classItem.prompts) {
-      textVectors.push(prompt.vector);
+      checkVectors.push(prompt.vector);
     }
+    checkVectors.push(...classItem.classVectors);
   }
   const imageVectors = [];
   for (const embedding of embeddings) {
-    imageVectors.push(embedding.embeddings);
+    imageVectors.push(embedding);
   }
   const batchSize = 20;
   for (let i = 0; i < imageVectors.length; i += batchSize) {
     const batchImageVectors = imageVectors.slice(i, i + batchSize);
-    const logits = await model.imageLogits(batchImageVectors, textVectors);
-    console.log(logits);
+    const logits = await model.imageLogits(batchImageVectors, checkVectors);
     for (let j = 0; j < logits.length; j++) {
       const max = Math.max(...logits[j]);
       const index = logits[j].indexOf(max);
-      if (max > 0.75) {
+      if (max > 0.5) {
         let c = 0;
         for (const classItem of collection.classes) {
           for (const _ of classItem.prompts) {
             if (c === index) {
-              classItem.files.push(collection.unsortedFiles[i + j]);
+              classItem.files.push(allFiles[i + j]);
+            }
+            c++;
+          }
+          for (const _ of classItem.classVectors) {
+            if (c === index) {
+              classItem.files.push(allFiles[i + j]);
             }
             c++;
           }
         }
       } else {
-        newUnsorted.push(collection.unsortedFiles[i + j]);
+        newUnsorted.push(allFiles[i + j]);
       }
     }
   }
@@ -121,8 +150,8 @@ const classify = async (
 const processFiles = async (
   files: FileInfo[],
   model: ZeroShotClassificationModel
-): Promise<EmbeddedResource[]> => {
-  const resources: EmbeddedResource[] = [];
+): Promise<number[][]> => {
+  const res: number[][] = [];
   const batchSize = 4;
   for (let i = 0; i < files.length; i += batchSize) {
     const batchHandles = files
@@ -130,15 +159,19 @@ const processFiles = async (
       .map((item) => item.handle);
     const batchURLs = await handlesToURLs(batchHandles);
     const output = await model.embedImages(batchURLs);
-    const batchResources = output.map((embedding, index) => ({
-      id: files[i + index].id,
-      title: files[i + index].name,
-      url: "",
-      embeddings: embedding,
-    }));
-    resources.push(...batchResources);
+    res.push(...output);
+    for (let j = 0; j < output.length; j++) {
+      files[i + j].embedding = output[j];
+    }
+    // const batchResources = output.map((embedding, index) => ({
+    //   id: files[i + index].id,
+    //   title: files[i + index].name,
+    //   url: "",
+    //   embeddings: embedding,
+    // }));
+    // res.push(...batchResources);
   }
-  return resources;
+  return res;
 };
 
 const handlesToURLs = async (handles: FileSystemFileHandle[]) => {

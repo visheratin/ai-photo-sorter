@@ -3,4 +3,5 @@ export interface FileInfo {
   name: string;
   handle: FileSystemFileHandle;
   updateTime: number;
+  embedding: number[];
 }

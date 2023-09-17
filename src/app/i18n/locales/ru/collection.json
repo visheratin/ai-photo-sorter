@@ -9,5 +9,6 @@
     "dialog-close": "Закрыть",
     "num-files": "Файлов",
     "title": "Название",
-    "create-new": "Сохранить"
+    "create-new": "Сохранить",
+    "unsorted-items": "Неотсортированные"
 }

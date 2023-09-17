@@ -45,4 +45,9 @@ export class Database {
     this.setCollections();
     await localforage.removeItem(collection.id);
   }
+
+  static async getCollection(id: string): Promise<Collection | null> {
+    this.setCollections();
+    return await localforage.getItem(id);
+  }
 }

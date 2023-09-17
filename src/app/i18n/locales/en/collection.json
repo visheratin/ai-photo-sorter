@@ -9,5 +9,6 @@
     "dialog-close": "Close",
     "num-files": "Files",
     "title": "Title",
-    "create-new": "Save"
+    "create-new": "Save",
+    "unsorted-items": "Unsorted items"
 }

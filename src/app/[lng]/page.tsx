@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import HeaderComponent from "@/components/header";
 import FooterComponent from "@/components/footer";
+import CollectionPage from "./collections/view/page";
 
 export default function Page({ params }: { params: { lng: string } }) {
   const [isServer, setIsServer] = useState(true);
@@ -19,7 +20,7 @@ export default function Page({ params }: { params: { lng: string } }) {
       element: (
         <>
           <HeaderComponent lng={params.lng} />
-          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col bg-background">
+          <main className="relative flex min-h-[calc(100vh-8.6rem)] flex-col bg-background">
             <Link to={`/${params.lng}/collections/new`}>New Collection</Link>
           </main>
           <FooterComponent lng={params.lng} />
@@ -31,7 +32,7 @@ export default function Page({ params }: { params: { lng: string } }) {
       element: (
         <>
           <HeaderComponent lng={params.lng} />
-          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col bg-background">
+          <main className="relative flex min-h-[calc(100vh-8.6rem)] flex-col bg-background">
             <CollectionsPage params={{ lng: params.lng }} />
           </main>
           <FooterComponent lng={params.lng} />
@@ -43,8 +44,20 @@ export default function Page({ params }: { params: { lng: string } }) {
       element: (
         <>
           <HeaderComponent lng={params.lng} />
-          <main className="relative flex min-h-[calc(100vh-9.6rem)] flex-col bg-background">
+          <main className="relative flex min-h-[calc(100vh-8.6rem)] flex-col bg-background">
             <NewCollectionPage params={{ lng: params.lng }} />
+          </main>
+          <FooterComponent lng={params.lng} />
+        </>
+      ),
+    },
+    {
+      path: `/${params.lng}/collections/view`,
+      element: (
+        <>
+          <HeaderComponent lng={params.lng} />
+          <main className="relative flex min-h-[calc(100vh-8.6rem)] flex-col bg-background">
+            <CollectionPage params={{ lng: params.lng }} />
           </main>
           <FooterComponent lng={params.lng} />
         </>
