@@ -10,5 +10,9 @@
     "num-files": "Files",
     "title": "Title",
     "create-new": "Save",
-    "unsorted-items": "Unsorted items"
+    "unsorted-items": "Unsorted items",
+    "permission-header": "Permissions required",
+    "permission-body": "The browser resets folder permissions every time you refresh the page. Because of that, you need to grant permission to each folder in the collection again. If you won't refresh the page in the future, you won't need to grant permissions again.",
+    "permission-allow": "Allow",
+    "permission-deny": "Deny"
 }

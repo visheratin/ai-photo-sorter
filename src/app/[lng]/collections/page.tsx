@@ -40,7 +40,7 @@ export default function CollectionsPage({
   };
 
   return (
-    <div className="container pt-10">
+    <div className="container pt-5">
       <h1 className="text-4xl font-bold">{t("title")}</h1>
       {collections.length !== 0 && (
         <Table className="mt-3">
@@ -54,11 +54,13 @@ export default function CollectionsPage({
           <TableBody>
             {collections.map((collection) => (
               <TableRow key={collection.id}>
-                <Link
-                  to={`/${params.lng}/collections/view?id=${collection.id}`}
-                >
-                  <TableCell>{collection.title}</TableCell>
-                </Link>
+                <TableCell>
+                  <Link
+                    to={`/${params.lng}/collections/view?id=${collection.id}`}
+                  >
+                    {collection.title}
+                  </Link>
+                </TableCell>
                 <TableCell>{collection.filesNumber}</TableCell>
                 <TableCell>{formatTime(collection.updateTime)}</TableCell>
               </TableRow>

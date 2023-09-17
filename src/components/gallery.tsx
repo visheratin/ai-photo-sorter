@@ -168,26 +168,27 @@ const PhotoGallery = (props: PhotoGalleryProps) => {
           </div>
         </div>
       </ScrollArea>
-      {currentImages.length !== 0 && (
-        <div className="flex justify-center mt-4">
-          <Button
-            className="px-4 py-2 border rounded-md mr-2"
-            onClick={goToPreviousPage}
-            disabled={currentPage === 1}
-            size="sm"
-          >
-            {t("previous")}
-          </Button>
-          <Button
-            className="px-4 py-2 border rounded-md"
-            onClick={goToNextPage}
-            disabled={currentPage === totalPages}
-            size="sm"
-          >
-            {t("next")}
-          </Button>
-        </div>
-      )}
+      {currentImages.length !== 0 &&
+        !(currentPage === 1 && currentPage === totalPages) && (
+          <div className="flex justify-center mt-4">
+            <Button
+              className="px-4 py-2 border rounded-md mr-2"
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              size="sm"
+            >
+              {t("previous")}
+            </Button>
+            <Button
+              className="px-4 py-2 border rounded-md"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              size="sm"
+            >
+              {t("next")}
+            </Button>
+          </div>
+        )}
 
       {selectedImage && (
         <div

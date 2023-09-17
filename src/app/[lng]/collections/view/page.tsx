@@ -1,13 +1,8 @@
 "use client";
 import { useTranslation } from "@/app/i18n/client";
 import { Database } from "@/lib/database";
-import { Navigate, useLocation } from "react-router-dom";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Link, Navigate, useLocation } from "react-router-dom";
+import { Pencil2Icon } from "@radix-ui/react-icons";
 import PhotoGallery from "@/components/gallery";
 import { Collection } from "@/lib/collection";
 import { useEffect, useState } from "react";
@@ -96,53 +91,59 @@ export default function CollectionPage({
   }, []);
 
   return (
-    <div className="container pt-10">
+    <div className="container pt-5">
       {notExists && <Navigate to={`/${params.lng}/collections`} />}
       {showCollection && (
         <>
-          <h1 className="text-4xl font-bold">{collection.title}</h1>
-          <Accordion type="single" collapsible>
-            {collection.classes.map((classItem) => (
-              <AccordionItem key={classItem.id} value={classItem.name}>
-                <AccordionTrigger>{classItem.name}</AccordionTrigger>
-                <AccordionContent>
-                  <PhotoGallery
-                    key={classItem.id}
-                    images={classItem.files.map((item) => item.handle)}
-                    lng={params.lng}
-                    markDeleted={() => {}}
-                    simple={true}
-                  />
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-            {collection.unsortedFiles.length > 0 && (
-              <AccordionItem key="__unsorted" value={t("unsorted-items")}>
-                <AccordionTrigger>{t("unsorted-items")}</AccordionTrigger>
-                <AccordionContent>
-                  <PhotoGallery
-                    images={collection.unsortedFiles.map((item) => item.handle)}
-                    lng={params.lng}
-                    markDeleted={() => {}}
-                    simple={true}
-                  />
-                </AccordionContent>
-              </AccordionItem>
-            )}
-          </Accordion>
+          <div className="flex items-center">
+            <h1 className="text-4xl font-bold">{collection.title}</h1>
+            <Link
+              to={`/${params.lng}/collections/edit?id=${collection.id}`}
+              className="ml-1"
+            >
+              <Pencil2Icon className="w-5 h-5 inline-block ml-2" />
+            </Link>
+          </div>
+          {collection.classes.map((classItem) => (
+            <div key={classItem.id} className="border-b mt-2 pb-4">
+              <h2 className="text-xl font-bold mb-3">{classItem.name}</h2>
+              <PhotoGallery
+                key={classItem.id}
+                images={classItem.files.map((item) => item.handle)}
+                lng={params.lng}
+                markDeleted={() => {}}
+                simple={true}
+              />
+            </div>
+          ))}
+          {collection.unsortedFiles.length > 0 && (
+            <div className="border-b mt-3 pb-3">
+              <h2 className="text-xl font-bold mb-2">{t("unsorted-items")}</h2>
+              <PhotoGallery
+                images={collection.unsortedFiles.map((item) => item.handle)}
+                lng={params.lng}
+                markDeleted={() => {}}
+                simple={true}
+              />
+            </div>
+          )}
         </>
       )}
 
       <AlertDialog open={alertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("load-header")}</AlertDialogTitle>
-            <AlertDialogDescription>{t("load-body")}</AlertDialogDescription>
+            <AlertDialogTitle>{t("permission-header")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("permission-body")}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("load-cancel")}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setNotExists(true)}>
+              {t("permission-deny")}
+            </AlertDialogCancel>
             <AlertDialogAction onClick={askPermissions}>
-              {t("load-confirm")}
+              {t("permission-allow")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

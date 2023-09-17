@@ -6,6 +6,8 @@ export interface ImageClass {
   prompts: ClassPrompt[];
   files: FileInfo[];
   classVectors: number[][];
+  startTime: number;
+  endTime: number;
 }
 
 export interface ClassPrompt {
