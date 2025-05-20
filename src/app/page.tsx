@@ -36,6 +36,8 @@ export default function Home() {
   const [movingFile, setMovingFile] = useState<FileInfo | undefined>();
 
   const [showMoveModal, setShowMoveModal] = useState(false);
+  
+  const [showBanner, setShowBanner] = useState(true);
 
   const setNewFiles = (newFiles: FileInfo[]) => {
     const existingFiles = files.map((file) => file.hash);
@@ -451,6 +453,24 @@ export default function Home() {
           )}
         </main>
       </div>
+      
+      {showBanner && (
+        <div className="fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-3 z-50 flex justify-between items-center shadow-lg">
+          <p className="text-center flex-grow">
+            Want a full-fledged image management experience? Visit <a href="https://organizewith.ai" className="underline font-semibold hover:text-blue-200" target="_blank" rel="noopener noreferrer">organizewith.ai</a>
+          </p>
+          <button 
+            onClick={() => setShowBanner(false)} 
+            className="ml-4 text-white hover:text-blue-200 focus:outline-none"
+            aria-label="Close banner"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      )}
+      
       <FooterComponent />
       <CodeSnippetModal
         unixCode={unixScript}
